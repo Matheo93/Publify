@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  name         String?
+  avatarUrl    String?   @map("avatar_url")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  drafts       Draft[]
+
+  @@map("users")
+}
+
+model Draft {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  content      String
+  mediaUrls    String[]  @map("media_urls")
+  networks     String[]
+  scheduledFor DateTime? @map("scheduled_for")
+  status       String    @default("draft")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  user         User      @relation(fields: [userId], references: [id])
+
+  @@map("drafts")
+  @@index([userId])
+}

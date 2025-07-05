@@ -1,0 +1,311 @@
+-- Active: 1724921348465@@127.0.0.1@3306@ntc
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          02/02/2025    13:59            190 .dockerignore
+-a---          30/01/2025    15:36           1310 .env
+-a---          12/11/2024    08:18             61 .eslintrc.json
+-a---          12/11/2024    08:18            463 .gitignore
+-a---          05/02/2025    14:05            397 appspec.yml
+-a---          05/02/2025    14:32            759 deploy.ps1
+-a---          01/02/2025    20:10           1009 docker-compose.yml
+-a---          05/02/2025    13:47            871 Dockerfile
+-a---          19/01/2025    11:52            211 next-env.d.ts
+-a---          03/02/2025    15:14            581 next.config.js
+-a---          12/11/2024    08:18            133 next.config.ts
+-a---          05/02/2025    02:18         403510 package-lock.json
+-a---          05/02/2025    02:18            981 package.json
+-a---          12/11/2024    08:18            135 postcss.config.mjs
+-a---          12/11/2024    08:18           1450 README.md
+-a---          05/02/2025    16:16              0 result.txt
+-a---          28/01/2025    15:20            499 tailwind.config.ts
+-a---          01/02/2025    19:29            601 tsconfig.json
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\.aws
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          04/02/2025    20:32           1053 waf-rules.yaml
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\.aws\kubernetes
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          04/02/2025    20:32            354 cluster.yaml
+-a---          04/02/2025    20:32            719 deployment.yaml
+-a---          04/02/2025    20:32            187 service.yaml
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\prisma
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          02/02/2025    13:54            984 schema.prisma
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\public
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          12/11/2024    08:18            391 file.svg
+-a---          12/11/2024    08:18           1035 globe.svg
+-a---          12/11/2024    08:18           1375 next.svg
+-a---          12/11/2024    08:18            128 vercel.svg
+-a---          12/11/2024    08:18            385 window.svg
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\public\fonts\Inter
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          24/01/2025    10:50          25908 55c55f0601d81cf3-s.woff2
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\public\fonts\Lexend
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          24/01/2025    10:50          13668 630e0b819503bca7-s.woff2
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\public\images\backgrounds
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          23/01/2025    14:37          17374 background-auth.4bcf3f4b.jpg
+-a---          23/01/2025    14:51         166094 background-call-to-action.6a5a5672.jpg
+-a---          23/01/2025    14:39          75878 background-faqs.55d2e36a.jpg
+-a---          23/01/2025    14:36         185113 background-features.5f7a9ac9.jpg
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\public\img
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          13/12/2024    15:38          34525 log.svg
+-a---          13/12/2024    15:38          26911 register.svg
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\public\img\previews
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          26/01/2025    21:30        1961263 18379.jpg
+-a---          26/01/2025    21:28        1127905 66162.jpg
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\scripts
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          30/01/2025    18:49            684 create-test-user.ts
+-a---          05/02/2025    14:06            155 start_application.sh
+-a---          05/02/2025    14:05             35 stop_application.sh
+-a---          30/01/2025    15:32            401 test-db.ts
+-a---          05/02/2025    14:05            226 update_application.sh
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          31/01/2025    11:02           2227 middleware.ts
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\api\auth\signup
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          30/01/2025    18:54           1293 route.ts
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\api\drafts
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          02/02/2025    13:50           3978 route.ts
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\api\linkedin\post
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          01/02/2025    19:57           4273 route.ts
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\api\twitter\post
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          01/02/2025    19:56           1995 route.ts
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\api\upload
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          01/02/2025    19:57           7927 route.ts
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\fonts
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          24/01/2025    10:50          18820 26a46d62cd723877-s.woff2
+-a---          24/01/2025    10:50          25908 55c55f0601d81cf3-s.woff2
+-a---          24/01/2025    10:50          19072 581909926a08bbc8-s.woff2
+-a---          24/01/2025    10:50          13668 630e0b819503bca7-s.woff2
+-a---          24/01/2025    10:50          34332 6a1a9d784472a388-s.woff2
+-a---          24/01/2025    10:50          74316 6d93bde91c0c2823-s.woff2
+-a---          23/01/2025    14:32          39760 84455f2b5a591033-s.p.woff2
+-a---          24/01/2025    10:50          11220 97e0cb1ae144a2a9-s.woff2
+-a---          23/01/2025    14:32          48556 a34f9d1faa5f3315-s.p.woff2
+-a---          24/01/2025    10:50          10280 df0a9ae256c0569c-s.woff2
+-a---          12/11/2024    08:18          67864 GeistMonoVF.woff
+-a---          12/11/2024    08:18          66268 GeistVF.woff
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\[locale]
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          12/11/2024    08:18          25931 favicon.ico
+-a---          28/01/2025    15:20           1349 globals.css
+-a---          01/02/2025    19:56           1216 layout.tsx
+-a---          26/01/2025    20:06           2549 page.tsx
+-a---          30/01/2025    23:58            824 providers.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\[locale]\auth
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          26/01/2025    20:45           7440 auth.module.css
+-a---          30/01/2025    18:55          10662 page.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\[locale]\draft
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          30/01/2025    18:58          12183 page.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\[locale]\home
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          29/01/2025    10:25          38079 page.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\[locale]\preview
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          30/01/2025    19:24          22358 page.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\[locale]\price
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          22/01/2025    11:33           5860 page.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\[locale]\privacy-terms
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          22/01/2025    11:21          11181 page.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\[locale]\settings
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          30/01/2025    23:35           4428 page.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\[locale]\settings\account
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          31/01/2025    15:05          11904 page.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\[locale]\settings\billing
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          31/01/2025    14:33           7664 page.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\[locale]\settings\security
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          31/01/2025    14:35          10303 page.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\[locale]\support
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          22/01/2025    10:53           8061 page.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\app\[locale]\videos
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          05/02/2025    14:57          22444 page.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\components
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          31/01/2025    11:48           2838 navigation.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\components\auth
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          20/01/2025    11:06           1013 login-button.tsx
+-a---          12/12/2024    17:50            730 LoginSVG.tsx
+-a---          12/12/2024    17:50            587 RegisterSVG.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\components\layout
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          09/12/2024    14:33           3176 navigation.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\components\networks
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          20/01/2025    11:43           4859 network-settings.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\components\post
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          30/01/2025    19:17          25193 post-editor.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\components\ui
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          12/11/2024    08:56            749 button.tsx
+-a---          12/11/2024    09:53            298 card.tsx
+-a---          28/01/2025    15:07            909 preview-selector.tsx
+-a---          31/01/2025    14:19           5657 profile-menu.tsx
+-a---          19/01/2025    11:13           2023 tabs.tsx
+-a---          20/01/2025    11:06           1907 upload-progress.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\contexts
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          30/01/2025    16:30           1317 LanguageContext.tsx
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\i18n
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          30/01/2025    19:15          36198 config.ts
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\lib
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          02/02/2025    01:07           2506 auth-config.ts
+-a---          30/01/2025    15:25            317 prisma.ts
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\services
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          30/01/2025    15:18           1573 auth.ts
+-a---          02/02/2025    13:56           2178 user.ts
+
+    Directory: C:\Users\mathb\Desktop\Cours\TP\linkedin-publisher\src\types
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          02/02/2025    13:48            515 next-auth.d.ts
+

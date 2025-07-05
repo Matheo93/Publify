@@ -1,7 +1,7 @@
 // src/app/api/twitter/post/route.ts
-import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-config";
 
 interface MediaItem {
   id: string;
@@ -24,12 +24,9 @@ interface TweetBody {
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
-  
+
   if (!session?.accessToken) {
-    return NextResponse.json(
-      { error: 'Not authenticated' },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
   try {
@@ -43,7 +40,7 @@ export async function POST(req: Request) {
     // Si des médias sont fournis, les ajouter à la requête
     if (media && media.length > 0) {
       tweetBody.media = {
-        media_ids: media.map(m => m.id)
+        media_ids: media.map((m) => m.id),
       };
     }
 
@@ -53,28 +50,24 @@ export async function POST(req: Request) {
     }
 
     // Appel à l'API Twitter
-    const twitterResponse = await fetch('https://api.twitter.com/2/tweets', {
-      method: 'POST',
+    const twitterResponse = await fetch("https://api.twitter.com/2/tweets", {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${session.accessToken}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.accessToken}`,
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(tweetBody)
+      body: JSON.stringify(tweetBody),
     });
 
     if (!twitterResponse.ok) {
       const errorData = await twitterResponse.json();
-      throw new Error(errorData.detail || 'Failed to post to Twitter');
+      throw new Error(errorData.detail || "Failed to post to Twitter");
     }
 
     const data = await twitterResponse.json();
     return NextResponse.json({ success: true, data });
-    
   } catch (error) {
-    console.error('Twitter API error:', error);
-    return NextResponse.json(
-      { error: String(error) },
-      { status: 500 }
-    );
+    console.error("Twitter API error:", error);
+    return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }

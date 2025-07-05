@@ -17,33 +17,76 @@ export default function AuthPage() {
   const { auth } = dictionary;
 
   const [isSignUpMode, setIsSignUpMode] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
     username: '',
     email: '',
     password: ''
   });
 
+  const ErrorMessage = () => error && (
+    <div className="text-red-500 text-sm mt-2 bg-red-50 p-2 rounded">
+      {error}
+    </div>
+  );
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
+    setError(null); // Clear error when user types
   };
 
   const handleSubmit = async (e: React.FormEvent, type: 'signin' | 'signup') => {
     e.preventDefault();
-    if (type === 'signin') {
-      try {
-        await signIn('credentials', {
-          username: formData.username,
+    setError(null);
+    
+    try {
+      if (type === 'signin') {
+        const result = await signIn('credentials', {
+          email: formData.username, // Using username field for email
           password: formData.password,
-          callbackUrl: '/'
+          redirect: false
         });
-      } catch (error) {
-        console.error('Sign in error:', error);
+
+        if (result?.error) {
+          setError(result.error);
+        } else if (result?.ok) {
+          window.location.href = '/';
+        }
+      } else {
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            username: formData.username
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data.error);
+        } else {
+          // Auto sign in after successful signup
+          const result = await signIn('credentials', {
+            email: formData.email,
+            password: formData.password,
+            callbackUrl: '/'
+          });
+
+          if (result?.error) {
+            setError(result.error);
+          }
+        }
       }
-    } else {
-      console.log('Sign up:', formData);
+    } catch (error) {
+      setError(`${type === 'signin' ? 'Sign in' : 'Sign up'} error: ${error}`);
     }
   };
 
@@ -51,7 +94,7 @@ export default function AuthPage() {
     try {
       await signIn(provider, { callbackUrl: '/' });
     } catch (error) {
-      console.error('Social login error:', error);
+      setError(`Social login error: ${error}`);
     }
   };
 
@@ -88,6 +131,9 @@ export default function AuthPage() {
                 required
               />
             </div>
+            
+            <ErrorMessage />
+
             <button type="submit" className={styles.btn}>
               {auth.signIn.button}
             </button>
@@ -170,6 +216,9 @@ export default function AuthPage() {
                 minLength={6}
               />
             </div>
+
+            <ErrorMessage />
+            
             <button type="submit" className={styles.btn}>
               {auth.signUp.button}
             </button>
@@ -259,8 +308,8 @@ export default function AuthPage() {
               <Image
                 src="/img/register.svg"
                 alt="Register illustration"
-                width={500}
-                height={500}
+                width={800}
+                height={800}
                 className={styles.image}
                 priority
               />

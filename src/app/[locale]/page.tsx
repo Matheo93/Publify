@@ -1,4 +1,3 @@
-// src/app/[locale]/page.tsx
 'use client';
 
 import React from 'react';
@@ -17,6 +16,10 @@ const Icon = ({ children }: { children: React.ReactNode }) => (
 export default function DashboardPage() {
   const { dictionary } = useLanguage();
 
+  if (!dictionary) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -27,15 +30,15 @@ export default function DashboardPage() {
               <TabsList>
                 <TabsTrigger value="compose">
                   <Icon>✏️</Icon>
-                  {dictionary.dashboard.navigation.compose}
+                  {dictionary.dashboard?.navigation?.compose || 'Compose'}
                 </TabsTrigger>
                 <TabsTrigger value="scheduled">
                   <Icon>⏰</Icon>
-                  {dictionary.dashboard.navigation.scheduled}
+                  {dictionary.dashboard?.navigation?.scheduled || 'Scheduled'}
                 </TabsTrigger>
                 <TabsTrigger value="networks">
                   <Icon>⚙️</Icon>
-                  {dictionary.dashboard.navigation.networks}
+                  {dictionary.dashboard?.navigation?.networks || 'Networks'}
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -50,10 +53,10 @@ export default function DashboardPage() {
               <div className="max-w-2xl mx-auto py-8 px-4">
                 <div className="bg-white rounded-lg shadow p-6">
                   <h2 className="text-lg font-semibold mb-4">
-                    {dictionary.dashboard.scheduled.title}
+                    {dictionary.dashboard?.scheduled?.title || 'Scheduled Posts'}
                   </h2>
                   <p className="text-gray-500">
-                    {dictionary.dashboard.scheduled.empty}
+                    {dictionary.dashboard?.scheduled?.empty || 'No scheduled posts yet.'}
                   </p>
                 </div>
               </div>

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { 
   Smartphone,
@@ -16,6 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Bookmark,
+  ImageIcon
 } from 'lucide-react';
 
 interface PreviewData {
@@ -31,6 +31,15 @@ interface PreviewData {
 
 type SocialPlatform = 'linkedin' | 'twitter' | 'facebook' | 'instagram';
 type DeviceType = 'mobile' | 'desktop';
+
+const PlaceholderMedia = ({ index, className = '' }: { index: number; className?: string }) => (
+  <div className={`relative aspect-square w-full bg-gray-100 flex flex-col items-center justify-center ${className}`}>
+    <div className="w-10 h-10 mb-2 text-gray-400">
+      <ImageIcon className="w-full h-full" />
+    </div>
+    <span className="text-sm text-gray-400 font-medium">Aperçu média {index + 1}</span>
+  </div>
+);
 
 const FormattedDate = ({ date, locale }: { date: string | null; locale: string }) => {
   const [formattedDate, setFormattedDate] = useState('');
@@ -56,10 +65,7 @@ const FormattedDate = ({ date, locale }: { date: string | null; locale: string }
     }
   }, [date, locale]);
 
-  if (!formattedDate) {
-    return null;
-  }
-
+  if (!formattedDate) return null;
   return <>{formattedDate}</>;
 };
 
@@ -77,17 +83,48 @@ const demoData: PreviewData = {
   media: [
     {
       type: 'image',
-      previewUrl: '/api/placeholder/800/800',
+      previewUrl: '/img/previews/18379.jpg',
       fileName: 'app-preview.jpg'
     },
     {
       type: 'image',
-      previewUrl: '/api/placeholder/800/800',
+      previewUrl: '/img/previews/66162.jpg',
       fileName: 'features.jpg'
     }
   ],
   selectedNetworks: ['linkedin', 'twitter', 'facebook', 'instagram'],
   scheduledDateTime: new Date(Date.now() + 86400000).toISOString()
+};
+
+const MediaPreview = ({ mediaItem, index, className = '' }: { 
+  mediaItem: PreviewData['media'][0];
+  index: number;
+  className?: string;
+}) => {
+  const [error, setError] = useState(false);
+
+  if (error || !mediaItem.previewUrl) {
+    return <PlaceholderMedia index={index} className={className} />;
+  }
+
+  return (
+    <div className={`relative w-full h-full ${className}`}>
+      {mediaItem.type === 'image' ? (
+        <div
+          className="w-full h-full bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${mediaItem.previewUrl})` }}
+          onError={() => setError(true)}
+        />
+      ) : (
+        <video
+          src={mediaItem.previewUrl}
+          className="w-full h-full object-cover"
+          onError={() => setError(true)}
+          controls
+        />
+      )}
+    </div>
+  );
 };
 
 const SocialPreview = () => {
@@ -207,22 +244,12 @@ const SocialPreview = () => {
           <div className="rounded-lg overflow-hidden border border-gray-200">
             <div className="grid grid-cols-2 gap-1">
               {data.media.map((media, index) => (
-                <div key={index} className="relative aspect-[4/3]">
-                  {media.type === 'image' ? (
-                    <Image
-                      src={media.previewUrl}
-                      alt={media.fileName}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <video
-                      src={media.previewUrl}
-                      className="w-full h-full object-cover"
-                      controls
-                    />
-                  )}
-                </div>
+                <MediaPreview
+                  key={index}
+                  mediaItem={media}
+                  index={index}
+                  className="aspect-[4/3]"
+                />
               ))}
             </div>
           </div>
@@ -272,22 +299,12 @@ const SocialPreview = () => {
               <div className="mt-3 overflow-hidden rounded-xl border border-gray-100">
                 <div className="grid grid-cols-2 gap-0.5">
                   {data.media.map((media, index) => (
-                    <div key={index} className="relative aspect-square">
-                      {media.type === 'image' ? (
-                        <Image
-                          src={media.previewUrl}
-                          alt={media.fileName}
-                          fill
-                          className="object-cover border-[0.5px] border-gray-100"
-                        />
-                      ) : (
-                        <video
-                          src={media.previewUrl}
-                          className="w-full h-full object-cover border-[0.5px] border-gray-100"
-                          controls
-                        />
-                      )}
-                    </div>
+                    <MediaPreview
+                      key={index}
+                      mediaItem={media}
+                      index={index}
+                      className="aspect-square border-[0.5px] border-gray-100"
+                    />
                   ))}
                 </div>
               </div>
@@ -344,11 +361,10 @@ const SocialPreview = () => {
         {data.media && data.media.length > 0 && (
           <div className="mt-3 -mx-4">
             <div className="aspect-[4/3] relative">
-              <Image
-                src={data.media[0].previewUrl}
-                alt={data.media[0].fileName}
-                fill
-                className="object-cover"
+              <MediaPreview
+                mediaItem={data.media[0]}
+                index={0}
+                className="w-full h-full"
               />
             </div>
           </div>
@@ -430,11 +446,10 @@ const SocialPreview = () => {
   
       <div className="relative">
         <div className="relative aspect-square">
-          <Image
-            src={data.media[currentMediaIndex].previewUrl}
-            alt="Post"
-            fill
-            className="object-cover"
+          <MediaPreview
+            mediaItem={data.media[currentMediaIndex]}
+            index={currentMediaIndex}
+            className="w-full h-full"
           />
         </div>
         {data.media.length > 1 && (
@@ -545,9 +560,9 @@ const SocialPreview = () => {
           </button>
           <button
             className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-            onClick={() => window.history.back()}
+            onClick={() => window.close()}
           >
-            {preview.actions.backToEditor}
+            {preview.actions.close}
           </button>
         </div>
       </div>

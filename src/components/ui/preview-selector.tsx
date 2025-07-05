@@ -1,3 +1,4 @@
+// src/components/ui/preview-selector.tsx
 import React from 'react';
 
 interface PreviewSelectorProps {

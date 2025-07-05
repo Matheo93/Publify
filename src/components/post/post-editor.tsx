@@ -1,3 +1,4 @@
+// src/components/post/post-editor.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -368,6 +369,62 @@ export const PostEditor = () => {
       return newMedia;
     });
   };
+  // Modifier la fonction handleSaveDraft dans le composant PostEditor
+  const handleSaveDraft = async () => {
+    try {
+      if (!content.trim() && uploadedMedia.length === 0) {
+        setError(editor.alerts.emptyContent);
+        return;
+      }
+  
+      const scheduledDateTime = isScheduled 
+        ? new Date(`${scheduledDate}T${scheduledTime}`).toISOString()
+        : null;
+  
+      const response = await fetch('/api/drafts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          content,
+          media: uploadedMedia,
+          networks: selectedNetworks,
+          scheduledDateTime
+        })
+      });
+  
+      const responseData = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(responseData.error || editor.alerts.saveDraftError);
+      }
+  
+      // Réinitialiser le formulaire après la sauvegarde réussie
+      setContent('');
+      uploadedMedia.forEach(media => URL.revokeObjectURL(media.previewUrl));
+      setUploadedMedia([]);
+      setUploadProgress(null);
+      setUploadComplete({});
+      setIsScheduled(false);
+      setScheduledDate('');
+      setScheduledTime('');
+      
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+  
+      // Utiliser le message de succès existant pour la planification
+      alert(editor.alerts.schedulingSuccess);
+      window.location.href = '/draft';
+  
+    } catch (error) {
+      console.error('Error saving draft:', error);
+      setError(
+        error instanceof Error ? error.message : editor.alerts.saveDraftError
+      );
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -667,7 +724,7 @@ export const PostEditor = () => {
                 type="button"
                 variant="secondary"
                 disabled={isPosting}
-                onClick={() => alert(editor.alerts.draftSoon)}
+                onClick={handleSaveDraft}
               >
                 {editor.actions.saveAsDraft}
               </Button>

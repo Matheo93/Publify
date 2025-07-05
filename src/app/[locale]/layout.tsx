@@ -1,38 +1,42 @@
 // src/app/[locale]/layout.tsx
-import { Inter } from 'next/font/google'
-import { getServerSession } from 'next-auth'
-import { ValidLocale, getDictionary } from '@/i18n/config'
-import AuthProvider from '../providers'
-import { LanguageProvider } from '@/contexts/LanguageContext'
-import '../globals.css'
-import { authOptions } from '@/lib/auth'
+import { Inter } from "next/font/google";
+import { getServerSession } from "next-auth";
+import { ValidLocale, getDictionary } from "@/i18n/config";
+import AuthProvider from "./providers";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import "./globals.css";
+import { authOptions } from "@/lib/auth-config";
 
-const inter = Inter({ subsets: ['latin'] })
-
-export async function generateStaticParams() {
-  return [{ locale: 'en' }, { locale: 'fr' }]
-}
+const inter = Inter({ subsets: ["latin"] });
 
 export default async function RootLayout({
   children,
-  params
+  params,
 }: {
-  children: React.ReactNode
-  params: { locale: ValidLocale }
+  children: React.ReactNode;
+  params: Promise<{ locale: ValidLocale }>;
 }) {
-  const { locale } = params // Désormais on récupère locale après que params soit disponible
-  const session = await getServerSession(authOptions)
-  const dictionary = await getDictionary(locale)
+  const session = await getServerSession(authOptions);
+  const resolvedParams = await params;
+  const locale = resolvedParams.locale;
+  const dictionary = await getDictionary(locale);
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale}>
       <body className={inter.className}>
-        <AuthProvider session={session}>
-          <LanguageProvider initialLocale={locale} initialDictionary={dictionary}>
+        <AuthProvider
+          session={session}
+          initialLocale={locale}
+          initialDictionary={dictionary}
+        >
+          <LanguageProvider
+            initialLocale={locale}
+            initialDictionary={dictionary}
+          >
             {children}
           </LanguageProvider>
         </AuthProvider>
       </body>
     </html>
-  )
+  );
 }

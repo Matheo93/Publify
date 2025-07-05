@@ -380,21 +380,23 @@ export interface Dictionary {
      saveAsDraft: string;
    };
    alerts: {
-     error: string;
-     selectNetwork: string;
-     scheduleTimeRequired: string;
-     schedulingSuccess: string;
-     publishingSuccess: string;
-     draftSoon: string;
-     connectNetwork: string;
-     uploadFailed: string;
-     invalidFormat: string;
-     publishFailed: string;
-     publishSuccess: string;
-     unknownError: string;
-     publishError: string;
-     generalError: string;
-   };
+    error: string;
+    selectNetwork: string;
+    scheduleTimeRequired: string;
+    schedulingSuccess: string;
+    publishingSuccess: string;
+    draftSoon: string;
+    connectNetwork: string;
+    uploadFailed: string;
+    invalidFormat: string;
+    publishFailed: string;
+    publishSuccess: string;
+    unknownError: string;
+    publishError: string;
+    generalError: string;
+    emptyContent: string;
+    saveDraftError: string;
+  };
  };
 }
 
@@ -436,20 +438,22 @@ export const dictionaries: Record<ValidLocale, Dictionary> = {
        saveAsDraft: "Save as draft"
      },
      alerts: {
-       error: "Error:",
-       selectNetwork: "Please select at least one social network",
-       scheduleTimeRequired: "Please set a date and time for the scheduled post",
-       schedulingSuccess: "Posts scheduled successfully!",
-       publishingSuccess: "Successfully published on {count} network(s)!",
-       draftSoon: "Coming soon",
-       connectNetwork: "Please connect to this social network first",
-       uploadFailed: "Upload failed",
-       invalidFormat: "Invalid response format",
-       publishFailed: "Failed to publish on",
-       publishSuccess: "Successfully published on",
-       unknownError: "Unknown error",
-       publishError: "Publishing error",
-       generalError: "An error occurred during publication"
+      error: "Error:",
+      selectNetwork: "Please select at least one social network",
+      scheduleTimeRequired: "Please set a date and time for the scheduled post",
+      schedulingSuccess: "Posts scheduled successfully!",
+      publishingSuccess: "Successfully published on {count} network(s)!",
+      draftSoon: "Coming soon",
+      connectNetwork: "Please connect to this social network first",
+      uploadFailed: "Upload failed",
+      invalidFormat: "Invalid response format",
+      publishFailed: "Failed to publish on",
+      publishSuccess: "Successfully published on",
+      unknownError: "Unknown error",
+      publishError: "Publishing error",
+      generalError: "An error occurred during publication",
+      emptyContent: "Content cannot be empty",
+      saveDraftError: "Failed to save draft"
      }
    },
    common: {
@@ -866,20 +870,22 @@ export const dictionaries: Record<ValidLocale, Dictionary> = {
        saveAsDraft: "Enregistrer comme brouillon"
      },
      alerts: {
-       error: "Erreur :",
-       selectNetwork: "Veuillez sélectionner au moins un réseau social",
-       scheduleTimeRequired: "Veuillez définir une date et une heure pour la publication programmée",
-       schedulingSuccess: "Publications programmées avec succès !",
-       publishingSuccess: "Publications réussies sur {count} réseau(x) !",
-       draftSoon: "Fonctionnalité à venir",
-       connectNetwork: "Veuillez d'abord vous connecter à ce réseau social",
-       uploadFailed: "Échec de l'upload",
-       invalidFormat: "Format de réponse invalide",
-       publishFailed: "Échec de la publication sur",
-       publishSuccess: "Publication réussie sur",
-       unknownError: "Erreur inconnue",
-       publishError: "Erreur de publication",
-       generalError: "Une erreur est survenue lors de la publication"
+      error: "Erreur :",
+      selectNetwork: "Veuillez sélectionner au moins un réseau social",
+      scheduleTimeRequired: "Veuillez définir une date et une heure pour la publication programmée",
+      schedulingSuccess: "Publications programmées avec succès !",
+      publishingSuccess: "Publications réussies sur {count} réseau(x) !",
+      draftSoon: "Fonctionnalité à venir",
+      connectNetwork: "Veuillez d'abord vous connecter à ce réseau social",
+      uploadFailed: "Échec de l'upload",
+      invalidFormat: "Format de réponse invalide",
+      publishFailed: "Échec de la publication sur",
+      publishSuccess: "Publication réussie sur",
+      unknownError: "Erreur inconnue",
+      publishError: "Erreur de publication",
+      generalError: "Une erreur est survenue lors de la publication",
+      emptyContent: "Le contenu ne peut pas être vide",
+      saveDraftError: "Échec de l'enregistrement du brouillon"
      }
    },
    common: {

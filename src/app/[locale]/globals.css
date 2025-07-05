@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  color-scheme: light;
+}
+
+/* Force le thème clair pour tous les navigateurs */
+@media all {
+  :root {
+    --background: #ffffff;
+    --foreground: #171717;
+  }
+}
+
+/* S'assurer que le thème clair est maintenu même en mode sombre */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ffffff;
+    --foreground: #171717;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Support des dégradés pour Brave */
+.gradient-header {
+  background-color: #f8faff;
+  background-image: linear-gradient(to right, rgb(239, 246, 255), rgb(238, 242, 255));
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter/55c55f0601d81cf3-s.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Lexend';
+  src: url('/fonts/Lexend/630e0b819503bca7-s.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-display: 'Lexend', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+}
