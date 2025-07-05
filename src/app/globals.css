@@ -5,12 +5,22 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  color-scheme: light;
 }
 
+/* Force le thème clair pour tous les navigateurs */
+@media all {
+  :root {
+    --background: #ffffff;
+    --foreground: #171717;
+  }
+}
+
+/* S'assurer que le thème clair est maintenu même en mode sombre */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #ffffff;
+    --foreground: #171717;
   }
 }
 
@@ -18,4 +28,10 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Support des dégradés pour Brave */
+.gradient-header {
+  background-color: #f8faff;
+  background-image: linear-gradient(to right, rgb(239, 246, 255), rgb(238, 242, 255));
 }
