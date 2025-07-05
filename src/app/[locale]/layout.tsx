@@ -15,14 +15,15 @@ export async function generateStaticParams() {
 
 export default async function RootLayout({
   children,
-  params: { locale }
+  params
 }: {
   children: React.ReactNode
   params: { locale: ValidLocale }
 }) {
+  const { locale } = params // Désormais on récupère locale après que params soit disponible
   const session = await getServerSession(authOptions)
   const dictionary = await getDictionary(locale)
-  
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={inter.className}>

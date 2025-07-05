@@ -1,11 +1,14 @@
-// src/app/privacy-terms/page.tsx
+// src/app/[locale]/privacy-terms/page.tsx
 'use client';
 
 import React, { useState } from 'react';
 import { Shield, Lock, Check, ExternalLink, FileText, Key } from 'lucide-react';
 import Navigation from '@/components/navigation';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function TermsPage() {
+  const { dictionary } = useLanguage();
+  const { terms } = dictionary;
   const [activeTab, setActiveTab] = useState<'privacy' | 'terms'>('privacy');
 
   const platforms = [
@@ -16,21 +19,13 @@ export default function TermsPage() {
     { name: 'TikTok', icon: '#tiktok-icon' }
   ];
 
-  const privacyHighlights = [
-    "Protection des données conformément au RGPD",
-    "Chiffrement de bout en bout des données sensibles",
-    "Aucun partage de données avec des tiers non autorisés",
-    "Contrôle total sur vos données personnelles",
-    "Transparence sur l'utilisation des données"
-  ];
+  const privacyHighlights = terms.privacy.highlights.map(item => ({
+    text: item
+  }));
 
-  const apiCompliance = [
-    "Respect strict des conditions d'utilisation des APIs",
-    "Authentification sécurisée OAuth 2.0",
-    "Limites de taux respectées",
-    "Stockage sécurisé des tokens d'accès",
-    "Audit régulier des permissions"
-  ];
+  const apiCompliance = terms.api.compliance.map(item => ({
+    text: item
+  }));
 
   return (
     <>
@@ -59,7 +54,6 @@ export default function TermsPage() {
         </svg>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* Header */}
           <div className="text-center max-w-3xl mx-auto mb-12">
             <div className="flex justify-center mb-6">
               <div className="rounded-full bg-blue-100 p-3">
@@ -67,17 +61,16 @@ export default function TermsPage() {
               </div>
             </div>
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Sécurité & Conformité
+              {terms.header.title}
             </h1>
             <p className="text-xl text-gray-600">
-              Notre engagement pour la protection de vos données et le respect des standards de l&#39;industrie
+              {terms.header.description}
             </p>
           </div>
 
-          {/* Section des plateformes */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
             <h2 className="text-lg font-semibold text-gray-900 mb-6 text-center">
-              Intégrations officielles et certifiées avec
+              {terms.platforms.title}
             </h2>
             <div className="flex justify-center items-center space-x-12">
               {platforms.map((platform) => (
@@ -93,7 +86,6 @@ export default function TermsPage() {
             </div>
           </div>
 
-          {/* Navigation Tabs */}
           <div className="flex justify-center mb-8">
             <div className="inline-flex rounded-lg bg-gray-100 p-1">
               <button
@@ -104,7 +96,7 @@ export default function TermsPage() {
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                Politique de confidentialité
+                {terms.tabs.privacy}
               </button>
               <button
                 onClick={() => setActiveTab('terms')}
@@ -114,32 +106,30 @@ export default function TermsPage() {
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                Conditions d&#39;utilisation
+                {terms.tabs.terms}
               </button>
             </div>
           </div>
 
-          {/* Content */}
           <div className="grid md:grid-cols-2 gap-8">
             {activeTab === 'privacy' ? (
               <>
-                {/* Privacy Content */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                   <div className="flex items-center mb-6">
                     <Lock className="h-6 w-6 text-blue-600 mr-3" />
-                    <h2 className="text-xl font-semibold text-gray-900">Protection des données</h2>
+                    <h2 className="text-xl font-semibold text-gray-900">{terms.privacy.title}</h2>
                   </div>
                   <ul className="space-y-4">
                     {privacyHighlights.map((highlight, index) => (
                       <li key={index} className="flex items-start">
                         <Check className="h-5 w-5 text-green-500 mr-3 mt-0.5" />
-                        <span className="text-gray-600">{highlight}</span>
+                        <span className="text-gray-600">{highlight.text}</span>
                       </li>
                     ))}
                   </ul>
                   <div className="mt-6 pt-6 border-t border-gray-100">
                     <a href="#" className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center">
-                      Voir la politique complète
+                      {terms.privacy.viewFull}
                       <ExternalLink className="h-4 w-4 ml-2" />
                     </a>
                   </div>
@@ -148,45 +138,40 @@ export default function TermsPage() {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                   <div className="flex items-center mb-6">
                     <Key className="h-6 w-6 text-blue-600 mr-3" />
-                    <h2 className="text-xl font-semibold text-gray-900">Utilisation des APIs</h2>
+                    <h2 className="text-xl font-semibold text-gray-900">{terms.api.title}</h2>
                   </div>
                   <ul className="space-y-4">
                     {apiCompliance.map((item, index) => (
                       <li key={index} className="flex items-start">
                         <Check className="h-5 w-5 text-green-500 mr-3 mt-0.5" />
-                        <span className="text-gray-600">{item}</span>
+                        <span className="text-gray-600">{item.text}</span>
                       </li>
                     ))}
                   </ul>
                   <div className="mt-6 pt-6 border-t border-gray-100">
                     <a href="#" className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center">
-                      Documentation technique
+                      {terms.api.documentation}
                       <ExternalLink className="h-4 w-4 ml-2" />
                     </a>
                   </div>
                 </div>
               </>
             ) : (
-<>
-                {/* Terms Content */}
+              <>
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                   <div className="flex items-center mb-6">
                     <FileText className="h-6 w-6 text-blue-600 mr-3" />
-                    <h2 className="text-xl font-semibold text-gray-900">Utilisation du service</h2>
+                    <h2 className="text-xl font-semibold text-gray-900">{terms.usage.title}</h2>
                   </div>
                   <div className="prose prose-blue">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">1. Conditions générales</h3>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">{terms.usage.general.title}</h3>
                     <p className="text-gray-600 mb-6">
-                      En utilisant Publify, vous acceptez de respecter nos conditions d&#39;utilisation ainsi que celles
-                      des plateformes de médias sociaux connectées. Notre service agit comme un intermédiaire pour
-                      faciliter la publication de contenu sur ces plateformes.
+                      {terms.usage.general.content}
                     </p>
                     
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">2. Responsabilités</h3>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">{terms.usage.responsibilities.title}</h3>
                     <p className="text-gray-600 mb-6">
-                      Les utilisateurs sont responsables du contenu qu&#39;ils publient via notre plateforme. Nous nous
-                      réservons le droit de suspendre ou de résilier les comptes qui ne respectent pas nos conditions
-                      d&#39;utilisation.
+                      {terms.usage.responsibilities.content}
                     </p>
                   </div>
                 </div>
@@ -194,21 +179,17 @@ export default function TermsPage() {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                   <div className="flex items-center mb-6">
                     <Shield className="h-6 w-6 text-blue-600 mr-3" />
-                    <h2 className="text-xl font-semibold text-gray-900">Conformité & Sécurité</h2>
+                    <h2 className="text-xl font-semibold text-gray-900">{terms.compliance.title}</h2>
                   </div>
                   <div className="prose prose-blue">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">3. Utilisation des APIs</h3>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">{terms.compliance.api.title}</h3>
                     <p className="text-gray-600 mb-6">
-                      Nous utilisons les APIs officielles des réseaux sociaux dans le strict respect de leurs
-                      conditions d&#39;utilisation. Cela inclut les limites de taux, les permissions d&#39;accès et les
-                      pratiques de stockage des données.
+                      {terms.compliance.api.content}
                     </p>
 
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">4. Sécurité des données</h3>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">{terms.compliance.security.title}</h3>
                     <p className="text-gray-600">
-                      Nous mettons en œuvre des mesures de sécurité robustes pour protéger vos données et vos
-                      tokens d&#39;accès. Toutes les communications sont chiffrées et nous suivons les meilleures
-                      pratiques de l&#39;industrie en matière de sécurité.
+                      {terms.compliance.security.content}
                     </p>
                   </div>
                 </div>
@@ -216,13 +197,12 @@ export default function TermsPage() {
             )}
           </div>
 
-          {/* Contact Section */}
           <div className="mt-12 text-center">
             <p className="text-gray-600 mb-4">
-              Des questions sur nos conditions d&#39;utilisation ou notre politique de confidentialité ?
+              {terms.contact.question}
             </p>
             <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              Contactez notre équipe juridique
+              {terms.contact.action}
             </button>
           </div>
         </div>

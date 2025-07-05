@@ -1,49 +1,50 @@
-// src/app/support/page.tsx
-
+// src/app/[locale]/support/page.tsx
 'use client';
 
 import React, { useState } from 'react';
 import { Mail, Phone, MessageCircle, ChevronDown, Search, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import Navigation from '@/components/navigation'; // Correction de l'import
-
-const FAQItems = [
-  // ... reste du code identique
-  {
-    question: "Comment programmer une publication ?",
-    answer: "Pour programmer une publication, créez d'abord votre contenu puis cliquez sur 'Programmer' en bas de l'éditeur. Vous pourrez alors choisir la date et l'heure de publication souhaitées."
-  },
-  {
-    question: "Comment connecter mes réseaux sociaux ?",
-    answer: "Rendez-vous dans l'onglet 'Réseaux sociaux' de votre tableau de bord. Cliquez sur 'Connecter' pour chaque réseau social que vous souhaitez ajouter et suivez les étapes d'authentification."
-  },
-  {
-    question: "Quelle est la taille maximale des médias ?",
-    answer: "Les images peuvent faire jusqu'à 10MB et les vidéos jusqu'à 200MB. Nous supportons les formats JPG, PNG, et MP4."
-  },
-  {
-    question: "Comment gérer mes publications programmées ?",
-    answer: "Toutes vos publications programmées sont visibles dans l'onglet 'Programmés'. Vous pouvez les modifier ou les annuler jusqu'à leur publication."
-  }
-];
-
-const recentTickets = [
-  {
-    id: 1,
-    title: "Problème de connexion LinkedIn",
-    status: "resolved",
-    date: "2024-03-10T10:30:00"
-  },
-  {
-    id: 2,
-    title: "Question sur la programmation",
-    status: "pending",
-    date: "2024-03-11T15:45:00"
-  }
-];
+import Navigation from '@/components/navigation';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function SupportPage() {
+  const { dictionary } = useLanguage();
+  const { support } = dictionary;
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const FAQItems = [
+    {
+      question: support.faq.scheduling.question,
+      answer: support.faq.scheduling.answer
+    },
+    {
+      question: support.faq.networks.question,
+      answer: support.faq.networks.answer
+    },
+    {
+      question: support.faq.media.question,
+      answer: support.faq.media.answer
+    },
+    {
+      question: support.faq.manage.question,
+      answer: support.faq.manage.answer
+    }
+  ];
+
+  const recentTickets = [
+    {
+      id: 1,
+      title: support.tickets.linkedinIssue,
+      status: "resolved",
+      date: "2024-03-10T10:30:00"
+    },
+    {
+      id: 2,
+      title: support.tickets.schedulingQuestion,
+      status: "pending",
+      date: "2024-03-11T15:45:00"
+    }
+  ];
 
   const filteredFAQ = FAQItems.filter(item =>
     item.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -53,28 +54,26 @@ export default function SupportPage() {
   return (
     <>
       <Navigation />
-      <div className="min-h-screen bg-gray-50 pt-16"> {/* Ajout du pt-16 pour le header */}
+      <div className="min-h-screen bg-gray-50 pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* Header Section */}
           <div className="text-center mb-16">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Comment pouvons-nous vous aider ?
+              {support.header.title}
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Explorez notre centre d&#39;aide ou contactez notre équipe de support pour toute question.
+              {support.header.description}
             </p>
           </div>
 
-          {/* Quick Actions */}
           <div className="grid md:grid-cols-3 gap-8 mb-16">
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:border-blue-200 transition-colors">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <MessageCircle className="h-6 w-6 text-blue-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Chat en direct</h3>
-              <p className="text-gray-600 mb-4">Discutez avec notre équipe de support en temps réel.</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{support.channels.chat.title}</h3>
+              <p className="text-gray-600 mb-4">{support.channels.chat.description}</p>
               <button className="text-blue-600 font-medium hover:text-blue-700">
-                Démarrer une conversation →
+                {support.channels.chat.action} →
               </button>
             </div>
 
@@ -82,10 +81,10 @@ export default function SupportPage() {
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <Mail className="h-6 w-6 text-blue-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Email Support</h3>
-              <p className="text-gray-600 mb-4">Envoyez-nous un email, nous répondons sous 24h.</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{support.channels.email.title}</h3>
+              <p className="text-gray-600 mb-4">{support.channels.email.description}</p>
               <button className="text-blue-600 font-medium hover:text-blue-700">
-                Envoyer un email →
+                {support.channels.email.action} →
               </button>
             </div>
 
@@ -93,23 +92,22 @@ export default function SupportPage() {
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <Phone className="h-6 w-6 text-blue-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Support téléphonique</h3>
-              <p className="text-gray-600 mb-4">Pour nos clients Premium et Entreprise.</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{support.channels.phone.title}</h3>
+              <p className="text-gray-600 mb-4">{support.channels.phone.description}</p>
               <button className="text-blue-600 font-medium hover:text-blue-700">
-                Voir le numéro →
+                {support.channels.phone.action} →
               </button>
             </div>
           </div>
 
-          {/* FAQ Section */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-16 overflow-hidden">
             <div className="p-6 border-b border-gray-100">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Questions fréquentes</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">{support.faq.title}</h2>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
                   type="text"
-                  placeholder="Rechercher dans la FAQ..."
+                  placeholder={support.faq.searchPlaceholder}
                   className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -139,13 +137,12 @@ export default function SupportPage() {
             </div>
           </div>
 
-          {/* Recent Tickets */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-6 border-b border-gray-100">
               <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-gray-900">Vos tickets récents</h2>
+                <h2 className="text-2xl font-bold text-gray-900">{support.tickets.title}</h2>
                 <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                  Nouveau ticket
+                  {support.tickets.newTicket}
                 </button>
               </div>
             </div>
@@ -174,7 +171,7 @@ export default function SupportPage() {
                         : 'bg-yellow-100 text-yellow-800'
                     }`}
                   >
-                    {ticket.status === 'resolved' ? 'Résolu' : 'En attente'}
+                    {ticket.status === 'resolved' ? support.tickets.resolved : support.tickets.pending}
                   </span>
                 </div>
               ))}

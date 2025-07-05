@@ -4,21 +4,28 @@
 import { useState } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { Card } from '@/components/ui/card';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { ValidLocale } from '@/i18n/config';
+
+interface NetworkDescription {
+  en: string;
+  fr: string;
+}
 
 interface NetworkStatus {
   id: string;
   name: string;
   icon: string;
-  description: string;
+  description: NetworkDescription;
 }
 
 export function NetworkSettings() {
+  const { dictionary } = useLanguage();
   const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
 
-  // Afficher un loader pendant la vérification de la session
   if (status === 'loading') {
-    return <div>Chargement...</div>;
+    return <div>{dictionary.common.loading}</div>;
   }
 
   const networks: NetworkStatus[] = [
@@ -26,17 +33,26 @@ export function NetworkSettings() {
       id: 'linkedin',
       name: 'LinkedIn',
       icon: 'LI',
-      description: 'Partagez du contenu professionnel avec votre réseau'
+      description: {
+        fr: 'Partagez du contenu professionnel avec votre réseau',
+        en: 'Share professional content with your network'
+      }
     },
     {
       id: 'twitter',
       name: 'X (Twitter)',
       icon: 'X',
-      description: 'Publiez des messages courts et engageants'
+      description: {
+        fr: 'Publiez des messages courts et engageants',
+        en: 'Post short and engaging messages'
+      }
     }
   ];
 
-  // Fonction pour vérifier si un réseau est connecté
+  const getCurrentLocale = (): ValidLocale => {
+    return dictionary.dashboard.navigation.networks === "Réseaux sociaux" ? "fr" : "en";
+  };
+
   const isConnected = (networkId: string) => {
     if (networkId === 'linkedin') {
       return status === 'authenticated' && session?.accessToken;
@@ -58,7 +74,7 @@ export function NetworkSettings() {
         });
       }
     } catch (error) {
-      console.error('Erreur de connexion:', error);
+      console.error(dictionary.errors.connectionError, error);
     } finally {
       setIsLoading(prev => ({ ...prev, [networkId]: false }));
     }
@@ -67,14 +83,16 @@ export function NetworkSettings() {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold text-gray-900">Réseaux sociaux</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{dictionary.networks.title}</h1>
         <p className="text-gray-500">
-          Connectez vos réseaux sociaux pour publier du contenu depuis Publisher
+          {dictionary.networks.description}
         </p>
 
         <div className="mt-8 space-y-4">
           {networks.map(network => {
             const connected = isConnected(network.id);
+            const currentLocale = getCurrentLocale();
+            
             return (
               <Card key={network.id} className="p-6">
                 <div className="flex items-start justify-between">
@@ -87,12 +105,12 @@ export function NetworkSettings() {
                         {network.name}
                       </h2>
                       <p className="text-sm text-gray-500 mt-1">
-                        {network.description}
+                        {network.description[currentLocale]}
                       </p>
                       <div className="flex items-center gap-2 mt-2">
                         <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500' : 'bg-gray-300'}`} />
                         <span className="text-sm text-gray-600">
-                          {connected ? 'Connecté' : 'Non connecté'}
+                          {connected ? dictionary.networks.status.connected : dictionary.networks.status.disconnected}
                         </span>
                       </div>
                     </div>
@@ -108,10 +126,10 @@ export function NetworkSettings() {
                       } ${isLoading[network.id] ? 'opacity-50 cursor-wait' : ''}`}
                   >
                     {isLoading[network.id] 
-                      ? 'En cours...'
+                      ? dictionary.common.loading
                       : connected 
-                        ? 'Se déconnecter' 
-                        : 'Se connecter'
+                        ? dictionary.networks.actions.disconnect 
+                        : dictionary.networks.actions.connect
                     }
                   </button>
                 </div>

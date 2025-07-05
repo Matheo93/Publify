@@ -3,12 +3,18 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Navigation = () => {
   const pathname = usePathname();
+  const { dictionary } = useLanguage();
 
   const isActive = (path: string) => {
-    return pathname === path
+    // Modification pour gérer les chemins avec locale
+    const currentPath = pathname.split('/').slice(2).join('/');
+    const targetPath = path.startsWith('/') ? path.slice(1) : path;
+    
+    return currentPath === targetPath
       ? "border-blue-500 text-gray-900"
       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700";
   };
@@ -18,7 +24,6 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
-            {/* Logo container with increased spacing */}
             <Link href="/" className="flex-shrink-0 flex items-center pr-12">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
                 P
@@ -30,40 +35,40 @@ const Navigation = () => {
                 href="/"
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${isActive('/')}`}
               >
-                Publisher
+                {dictionary.navigation.publisher}
               </Link>
               <Link
                 href="/draft"
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${isActive('/draft')}`}
               >
-                Mes Brouillons
+                {dictionary.navigation.drafts}
               </Link>
               <Link
                 href="/price"
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium group ${isActive('/price')}`}
               >
-                Upgrade
+                {dictionary.navigation.upgrade}
                 <span className="ml-2 px-2 py-0.5 text-xs bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full group-hover:opacity-90">
-                  New
+                  {dictionary.navigation.new}
                 </span>
               </Link>
               <Link
                 href="/support"
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${isActive('/support')}`}
               >
-                Support
+                {dictionary.navigation.support}
               </Link>
               <Link
                 href="/privacy-terms"
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${isActive('/privacy-terms')}`}
               >
-                Termes
+                {dictionary.navigation.terms}
               </Link>
             </div>
           </div>
           <div className="flex items-center space-x-4">
             <button className="bg-gray-100 p-2 rounded-full text-gray-400 hover:text-gray-500">
-              <span className="sr-only">Notifications</span>
+              <span className="sr-only">{dictionary.navigation.notifications}</span>
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>

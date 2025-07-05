@@ -1,4 +1,6 @@
+// src/components/ui/upload-progress.tsx
 import React from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface UploadProgressProps {
   status: 'uploading' | 'processing' | 'completed' | 'failed';
@@ -7,6 +9,9 @@ interface UploadProgressProps {
 }
 
 export function UploadProgress({ status, progress = 0, fileName }: UploadProgressProps) {
+  const { dictionary } = useLanguage();
+  const { progress: progressTexts } = dictionary.components;
+
   const getStatusColor = () => {
     switch (status) {
       case 'uploading':
@@ -25,13 +30,13 @@ export function UploadProgress({ status, progress = 0, fileName }: UploadProgres
   const getStatusText = () => {
     switch (status) {
       case 'uploading':
-        return 'Upload en cours...';
+        return progressTexts.uploading;
       case 'processing':
-        return 'Traitement de la vidéo...';
+        return progressTexts.processing;
       case 'completed':
-        return 'Terminé !';
+        return progressTexts.completed;
       case 'failed':
-        return 'Échec';
+        return progressTexts.failed;
       default:
         return '';
     }
