@@ -116,8 +116,8 @@ export default function VideoAnalyticsDashboard() {
           <div className="mb-8">
             <div className="flex justify-between items-center mb-6">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Mes Vidéos</h1>
-                <p className="mt-1 text-gray-500">Gérez et analysez vos contenus vidéos Raph le best </p>
+                <h1 className="text-2xl font-bold text-gray-900">Mes Vidéos blabla</h1>
+                <p className="mt-1 text-gray-500">Gérez et analysez vos contenus vidéos</p>
               </div>
               <div className="flex gap-4">
                 <div className="relative">

@@ -1,0 +1,14 @@
+{
+  "name": "publify-database-ccp2",
+  "version": "1.0.0",
+  "description": "Base de données pour démonstration CCP 2",
+  "scripts": {
+    "setup-sqlite": "node database/00_setup_sqlite.js",
+    "install-sqlite-tools": "npm install sqlite3 --save-dev",
+    "download-postgres": "start https://www.postgresql.org/download/windows/",
+    "test-db": "node database/test_connection.js"
+  },
+  "devDependencies": {
+    "sqlite3": "^5.1.6"
+  }
+}

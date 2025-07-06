@@ -1,120 +1,140 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Image from 'next/image';
-import { signIn } from 'next-auth/react';
-import styles from './auth.module.css';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useState } from "react";
+import Image from "next/image";
+import { signIn } from "next-auth/react";
+import styles from "./auth.module.css";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useRouter } from "next/navigation";
 
 interface FormData {
-  username: string;
-  email?: string;
+  email: string;
   password: string;
+  name?: string;
 }
 
 export default function AuthPage() {
-  const { dictionary } = useLanguage();
+  const { dictionary, locale } = useLanguage();
   const { auth } = dictionary;
-
+  const router = useRouter();
   const [isSignUpMode, setIsSignUpMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
-    username: '',
-    email: '',
-    password: ''
+    email: "",
+    password: "",
+    name: "",
   });
 
-  const ErrorMessage = () => error && (
-    <div className="text-red-500 text-sm mt-2 bg-red-50 p-2 rounded">
-      {error}
-    </div>
-  );
+  const ErrorMessage = () =>
+    error && (
+      <div className="text-red-500 text-sm mt-2 bg-red-50 p-2 rounded">
+        {error}
+      </div>
+    );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
-    setError(null); // Clear error when user types
+    setError(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent, type: 'signin' | 'signup') => {
+  const handleSubmit = async (
+    e: React.FormEvent,
+    type: "signin" | "signup"
+  ) => {
     e.preventDefault();
     setError(null);
-    
+
     try {
-      if (type === 'signin') {
-        const result = await signIn('credentials', {
-          email: formData.username, // Using username field for email
+      if (type === "signin") {
+        const result = await signIn("credentials", {
+          email: formData.email,
           password: formData.password,
-          redirect: false
+          redirect: false,
         });
 
         if (result?.error) {
           setError(result.error);
         } else if (result?.ok) {
-          window.location.href = '/';
+          router.push("/");
         }
       } else {
-        const response = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-            username: formData.username
-          }),
-        });
+        try {
+          const username = formData.email.split("@")[0];
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          setError(data.error);
-        } else {
-          // Auto sign in after successful signup
-          const result = await signIn('credentials', {
-            email: formData.email,
-            password: formData.password,
-            callbackUrl: '/'
+          const response = await fetch("/api/auth/cognito/signup", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username,
+              email: formData.email,
+              password: formData.password,
+              name: formData.name,
+            }),
           });
 
-          if (result?.error) {
-            setError(result.error);
+          const data = await response.json();
+
+          if (!response.ok) {
+            setError(data.error);
+          } else {
+            // Modification ici pour la redirection
+            // Updated code
+            router.push(
+              `/${locale}/verify?email=${encodeURIComponent(
+                formData.email
+              )}&username=${encodeURIComponent(username)}`
+            );
+          }
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            setError(`Registration error: ${err.message}`);
+          } else {
+            setError("An unexpected error occurred during registration");
           }
         }
       }
-    } catch (error) {
-      setError(`${type === 'signin' ? 'Sign in' : 'Sign up'} error: ${error}`);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(`Authentication error: ${err.message}`);
+      } else {
+        setError("An unexpected error occurred during authentication");
+      }
     }
   };
 
   const handleSocialLogin = async (provider: string) => {
     try {
-      await signIn(provider, { callbackUrl: '/' });
+      await signIn(provider, { callbackUrl: "/" });
     } catch (error) {
       setError(`Social login error: ${error}`);
     }
   };
 
   return (
-    <div className={`${styles.container} ${isSignUpMode ? styles.signUpMode : ''}`}>
+    <div
+      className={`${styles.container} ${isSignUpMode ? styles.signUpMode : ""}`}
+    >
       <div className={styles.formsContainer}>
         <div className={styles.signinSignup}>
-          <form 
-            className={styles.signInForm} 
-            onSubmit={(e) => handleSubmit(e, 'signin')}
+          {/* Sign In Form */}
+          <form
+            className={styles.signInForm}
+            onSubmit={(e) => handleSubmit(e, "signin")}
           >
             <h2 className={styles.title}>{auth.signIn.title}</h2>
             <div className={styles.inputField}>
-              <i className={`fas fa-user ${styles.icon}`} />
+              <i className={`fas fa-envelope ${styles.icon}`} />
               <input
                 className={styles.input}
-                type="text"
-                name="username"
-                placeholder={auth.signIn.username}
-                value={formData.username}
+                type="email"
+                name="email"
+                placeholder={auth.signIn.email}
+                value={formData.email}
                 onChange={handleInputChange}
                 required
               />
@@ -131,7 +151,7 @@ export default function AuthPage() {
                 required
               />
             </div>
-            
+
             <ErrorMessage />
 
             <button type="submit" className={styles.btn}>
@@ -139,33 +159,33 @@ export default function AuthPage() {
             </button>
             <p className={styles.socialText}>{auth.signIn.socialText}</p>
             <div className={styles.socialMedia}>
-              <button 
+              <button
                 type="button"
-                onClick={() => handleSocialLogin('linkedin')}
+                onClick={() => handleSocialLogin("linkedin")}
                 className={styles.socialIcon}
                 aria-label={auth.social.linkedin}
               >
                 <i className="fab fa-linkedin-in" />
               </button>
-              <button 
+              <button
                 type="button"
-                onClick={() => handleSocialLogin('facebook')}
+                onClick={() => handleSocialLogin("facebook")}
                 className={styles.socialIcon}
                 aria-label={auth.social.facebook}
               >
                 <i className="fab fa-facebook-f" />
               </button>
-              <button 
+              <button
                 type="button"
-                onClick={() => handleSocialLogin('google')}
+                onClick={() => handleSocialLogin("google")}
                 className={styles.socialIcon}
                 aria-label={auth.social.google}
               >
                 <i className="fab fa-google" />
               </button>
-              <button 
+              <button
                 type="button"
-                onClick={() => handleSocialLogin('twitter')}
+                onClick={() => handleSocialLogin("twitter")}
                 className={styles.socialIcon}
                 aria-label={auth.social.twitter}
               >
@@ -174,9 +194,10 @@ export default function AuthPage() {
             </div>
           </form>
 
-          <form 
-            className={styles.signUpForm} 
-            onSubmit={(e) => handleSubmit(e, 'signup')}
+          {/* Sign Up Form */}
+          <form
+            className={styles.signUpForm}
+            onSubmit={(e) => handleSubmit(e, "signup")}
           >
             <h2 className={styles.title}>{auth.signUp.title}</h2>
             <div className={styles.inputField}>
@@ -184,9 +205,9 @@ export default function AuthPage() {
               <input
                 className={styles.input}
                 type="text"
-                name="username"
-                placeholder={auth.signUp.username}
-                value={formData.username}
+                name="name"
+                placeholder={auth.signUp.name}
+                value={formData.name}
                 onChange={handleInputChange}
                 required
               />
@@ -218,39 +239,39 @@ export default function AuthPage() {
             </div>
 
             <ErrorMessage />
-            
+
             <button type="submit" className={styles.btn}>
               {auth.signUp.button}
             </button>
             <p className={styles.socialText}>{auth.signUp.socialText}</p>
             <div className={styles.socialMedia}>
-              <button 
+              <button
                 type="button"
-                onClick={() => handleSocialLogin('linkedin')}
+                onClick={() => handleSocialLogin("linkedin")}
                 className={styles.socialIcon}
                 aria-label={auth.social.linkedin}
               >
                 <i className="fab fa-linkedin-in" />
               </button>
-              <button 
+              <button
                 type="button"
-                onClick={() => handleSocialLogin('facebook')}
+                onClick={() => handleSocialLogin("facebook")}
                 className={styles.socialIcon}
                 aria-label={auth.social.facebook}
               >
                 <i className="fab fa-facebook-f" />
               </button>
-              <button 
+              <button
                 type="button"
-                onClick={() => handleSocialLogin('google')}
+                onClick={() => handleSocialLogin("google")}
                 className={styles.socialIcon}
                 aria-label={auth.social.google}
               >
                 <i className="fab fa-google" />
               </button>
-              <button 
+              <button
                 type="button"
-                onClick={() => handleSocialLogin('twitter')}
+                onClick={() => handleSocialLogin("twitter")}
                 className={styles.socialIcon}
                 aria-label={auth.social.twitter}
               >
@@ -265,10 +286,8 @@ export default function AuthPage() {
         <div className={styles.leftPanel}>
           <div className={styles.content}>
             <h3 className={styles.heading}>{auth.panels.left.title}</h3>
-            <p className={styles.paragraph}>
-              {auth.panels.left.description}
-            </p>
-            <button 
+            <p className={styles.paragraph}>{auth.panels.left.description}</p>
+            <button
               type="button"
               className={styles.transparentBtn}
               onClick={() => setIsSignUpMode(true)}
@@ -289,13 +308,12 @@ export default function AuthPage() {
             </div>
           </div>
         </div>
+
         <div className={styles.rightPanel}>
           <div className={styles.content}>
             <h3 className={styles.heading}>{auth.panels.right.title}</h3>
-            <p className={styles.paragraph}>
-              {auth.panels.right.description}
-            </p>
-            <button 
+            <p className={styles.paragraph}>{auth.panels.right.description}</p>
+            <button
               type="button"
               className={styles.transparentBtn}
               onClick={() => setIsSignUpMode(false)}

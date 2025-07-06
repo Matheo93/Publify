@@ -1,0 +1,19 @@
+Je prépare le CCP CP-003150 du titre professionnel Concepteur Développeur d’Applications, intitulé "Concevoir et développer une application sécurisée organisée".
+
+Voici les compétences à maîtriser pour ce bloc :
+
+Concevoir une base de données
+
+Mettre en place une base de données
+
+Développer des composants dans le langage d’une base de données
+
+Collaborer à la gestion d’un projet informatique et à l’organisation de l’environnement de développement
+
+Concevoir une application
+
+Développer des composants métier
+
+Construire une application organisée en couches
+
+Il me faut que tu integres en plus un schéma UML 

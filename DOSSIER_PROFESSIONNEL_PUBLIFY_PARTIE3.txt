@@ -1,0 +1,1799 @@
+================================================================================
+PARTIE 3 - BASE DE DONNÉES ET GESTION DE PROJET
+================================================================================
+
+================================================================================
+5. CONCEPTION DE LA BASE DE DONNÉES (COMPÉTENCE CP6)
+================================================================================
+
+5.1 MODÈLE CONCEPTUEL DE DONNÉES (MCD) - MÉTHODE MERISE
+--------------------------------------------------------
+
+```
+                    USER
+          +-----------------------+
+          | id_user (PK)          |
+          | email                 |
+          | password_hash         |
+          | name                  |
+          | role                  |
+          | mfa_enabled           |
+          | mfa_secret            |
+          | email_verified        |
+          | created_at            |
+          | updated_at            |
+          +-----------------------+
+                    |1,1
+                    |
+                    | CREATES
+                    |
+                    |0,n
+          +-----------------------+
+          |        DRAFT          |
+          | id_draft (PK)         |
+          | content               |
+          | status                |
+          | scheduled_at          |
+          | created_at            |
+          | updated_at            |
+          +-----------------------+
+                 |1,1  |0,n
+                 |     |
+        CONTAINS |     | TARGETS
+                 |     |
+           |0,n  |     |1,n
+    +------------+     +------------------+
+    |   MEDIA    |     |    PLATFORM      |
+    +------------+     +------------------+
+    | id_media   |     | id_platform (PK) |
+    | type       |     | name             |
+    | url        |     | icon_url         |
+    | size       |     | max_chars        |
+    | mime_type  |     | supports_media   |
+    +------------+     +------------------+
+                              |1,1
+                              |
+                         REQUIRES
+                              |
+                              |0,n
+                    +----------------------+
+                    | SOCIAL_CONNECTION    |
+                    | id_connection (PK)   |
+                    | user_id (FK)         |
+                    | platform_id (FK)     |
+                    | access_token         |
+                    | refresh_token        |
+                    | expires_at           |
+                    | scope                |
+                    +----------------------+
+                              |1,1
+                              |
+                         GENERATES
+                              |
+                              |0,n
+                    +----------------------+
+                    |    PUBLICATION       |
+                    | id_publication (PK)  |
+                    | draft_id (FK)        |
+                    | platform_id (FK)     |
+                    | external_id          |
+                    | published_at         |
+                    | status               |
+                    +----------------------+
+                              |1,1
+                              |
+                          TRACKS
+                              |
+                              |0,n
+                    +----------------------+
+                    |     ANALYTICS        |
+                    | id_analytics (PK)    |
+                    | publication_id (FK)  |
+                    | views                |
+                    | likes                |
+                    | shares               |
+                    | comments             |
+                    | clicks               |
+                    | engagement_rate      |
+                    | collected_at         |
+                    +----------------------+
+```
+
+5.2 MODÈLE LOGIQUE DE DONNÉES (MLD)
+------------------------------------
+
+```
+USER = (
+    #id_user: UUID,
+    email: VARCHAR(255) UNIQUE NOT NULL,
+    password_hash: VARCHAR(255) NOT NULL,
+    name: VARCHAR(100) NOT NULL,
+    role: ENUM('user', 'admin', 'moderator') DEFAULT 'user',
+    mfa_enabled: BOOLEAN DEFAULT FALSE,
+    mfa_secret: VARCHAR(255),
+    email_verified: BOOLEAN DEFAULT FALSE,
+    created_at: TIMESTAMP NOT NULL,
+    updated_at: TIMESTAMP NOT NULL
+)
+
+DRAFT = (
+    #id_draft: UUID,
+    #user_id: UUID,
+    content: TEXT NOT NULL,
+    status: ENUM('draft', 'scheduled', 'publishing', 'published', 'failed'),
+    scheduled_at: TIMESTAMP,
+    metadata: JSONB,
+    created_at: TIMESTAMP NOT NULL,
+    updated_at: TIMESTAMP NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES USER(id_user) ON DELETE CASCADE
+)
+
+PLATFORM = (
+    #id_platform: UUID,
+    name: VARCHAR(50) UNIQUE NOT NULL,
+    icon_url: VARCHAR(500),
+    max_chars: INTEGER,
+    supports_media: BOOLEAN DEFAULT TRUE,
+    supports_video: BOOLEAN DEFAULT FALSE,
+    api_endpoint: VARCHAR(500),
+    rate_limit: INTEGER
+)
+
+SOCIAL_CONNECTION = (
+    #id_connection: UUID,
+    #user_id: UUID,
+    #platform_id: UUID,
+    access_token: TEXT NOT NULL,
+    refresh_token: TEXT,
+    expires_at: TIMESTAMP,
+    scope: TEXT[],
+    profile_data: JSONB,
+    is_active: BOOLEAN DEFAULT TRUE,
+    created_at: TIMESTAMP NOT NULL,
+    updated_at: TIMESTAMP NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES USER(id_user) ON DELETE CASCADE,
+    FOREIGN KEY (platform_id) REFERENCES PLATFORM(id_platform),
+    UNIQUE(user_id, platform_id)
+)
+
+MEDIA = (
+    #id_media: UUID,
+    #draft_id: UUID,
+    type: ENUM('image', 'video', 'gif') NOT NULL,
+    url: VARCHAR(500) NOT NULL,
+    thumbnail_url: VARCHAR(500),
+    size: BIGINT NOT NULL,
+    mime_type: VARCHAR(100) NOT NULL,
+    width: INTEGER,
+    height: INTEGER,
+    duration: INTEGER,
+    metadata: JSONB,
+    upload_status: ENUM('pending', 'processing', 'completed', 'failed'),
+    created_at: TIMESTAMP NOT NULL,
+    FOREIGN KEY (draft_id) REFERENCES DRAFT(id_draft) ON DELETE CASCADE
+)
+
+DRAFT_PLATFORM = (
+    #draft_id: UUID,
+    #platform_id: UUID,
+    adapted_content: TEXT,
+    char_count: INTEGER,
+    FOREIGN KEY (draft_id) REFERENCES DRAFT(id_draft) ON DELETE CASCADE,
+    FOREIGN KEY (platform_id) REFERENCES PLATFORM(id_platform)
+)
+
+PUBLICATION = (
+    #id_publication: UUID,
+    #draft_id: UUID,
+    #platform_id: UUID,
+    external_id: VARCHAR(255),
+    published_at: TIMESTAMP NOT NULL,
+    status: ENUM('success', 'failed', 'pending'),
+    error_message: TEXT,
+    retry_count: INTEGER DEFAULT 0,
+    url: VARCHAR(500),
+    FOREIGN KEY (draft_id) REFERENCES DRAFT(id_draft),
+    FOREIGN KEY (platform_id) REFERENCES PLATFORM(id_platform)
+)
+
+ANALYTICS = (
+    #id_analytics: UUID,
+    #publication_id: UUID,
+    views: INTEGER DEFAULT 0,
+    likes: INTEGER DEFAULT 0,
+    shares: INTEGER DEFAULT 0,
+    comments: INTEGER DEFAULT 0,
+    clicks: INTEGER DEFAULT 0,
+    engagement_rate: DECIMAL(5,2),
+    reach: INTEGER DEFAULT 0,
+    impressions: INTEGER DEFAULT 0,
+    collected_at: TIMESTAMP NOT NULL,
+    raw_data: JSONB,
+    FOREIGN KEY (publication_id) REFERENCES PUBLICATION(id_publication)
+)
+
+AUDIT_LOG = (
+    #id_log: UUID,
+    #user_id: UUID,
+    action: VARCHAR(100) NOT NULL,
+    entity_type: VARCHAR(50),
+    entity_id: UUID,
+    old_values: JSONB,
+    new_values: JSONB,
+    ip_address: INET,
+    user_agent: TEXT,
+    created_at: TIMESTAMP NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES USER(id_user)
+)
+```
+
+5.3 MODÈLE PHYSIQUE DE DONNÉES (MPD) - SCRIPTS SQL
+---------------------------------------------------
+
+```sql
+-- Création de la base de données
+CREATE DATABASE publify_db
+    WITH 
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'fr_FR.UTF-8'
+    LC_CTYPE = 'fr_FR.UTF-8'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1;
+
+-- Extensions nécessaires
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- Types ENUM personnalisés
+CREATE TYPE user_role AS ENUM ('user', 'admin', 'moderator');
+CREATE TYPE draft_status AS ENUM ('draft', 'scheduled', 'publishing', 'published', 'failed');
+CREATE TYPE media_type AS ENUM ('image', 'video', 'gif');
+CREATE TYPE upload_status AS ENUM ('pending', 'processing', 'completed', 'failed');
+CREATE TYPE publication_status AS ENUM ('success', 'failed', 'pending');
+
+-- Table USERS
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    role user_role DEFAULT 'user',
+    mfa_enabled BOOLEAN DEFAULT FALSE,
+    mfa_secret VARCHAR(255),
+    email_verified BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT email_format CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
+);
+
+-- Index pour optimiser les recherches
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_created_at ON users(created_at DESC);
+
+-- Table PLATFORMS
+CREATE TABLE platforms (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(50) UNIQUE NOT NULL,
+    icon_url VARCHAR(500),
+    max_chars INTEGER,
+    supports_media BOOLEAN DEFAULT TRUE,
+    supports_video BOOLEAN DEFAULT FALSE,
+    api_endpoint VARCHAR(500),
+    rate_limit INTEGER,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Données initiales pour les plateformes
+INSERT INTO platforms (name, max_chars, supports_media, supports_video, api_endpoint, rate_limit) VALUES
+('LinkedIn', 3000, TRUE, TRUE, 'https://api.linkedin.com/v2', 100),
+('Twitter', 280, TRUE, TRUE, 'https://api.twitter.com/2', 300),
+('Facebook', 63206, TRUE, TRUE, 'https://graph.facebook.com/v17.0', 200),
+('Instagram', 2200, TRUE, TRUE, 'https://graph.instagram.com/v17.0', 200);
+
+-- Table DRAFTS
+CREATE TABLE drafts (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL,
+    content TEXT NOT NULL,
+    status draft_status DEFAULT 'draft',
+    scheduled_at TIMESTAMP WITH TIME ZONE,
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT content_not_empty CHECK (char_length(content) > 0)
+);
+
+-- Index pour les performances
+CREATE INDEX idx_drafts_user_id ON drafts(user_id);
+CREATE INDEX idx_drafts_status ON drafts(status);
+CREATE INDEX idx_drafts_scheduled_at ON drafts(scheduled_at) WHERE scheduled_at IS NOT NULL;
+
+-- Table SOCIAL_CONNECTIONS
+CREATE TABLE social_connections (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL,
+    platform_id UUID NOT NULL,
+    access_token TEXT NOT NULL,
+    refresh_token TEXT,
+    expires_at TIMESTAMP WITH TIME ZONE,
+    scope TEXT[],
+    profile_data JSONB DEFAULT '{}',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (platform_id) REFERENCES platforms(id),
+    UNIQUE(user_id, platform_id)
+);
+
+-- Index pour les performances
+CREATE INDEX idx_social_connections_user_platform ON social_connections(user_id, platform_id);
+CREATE INDEX idx_social_connections_expires_at ON social_connections(expires_at) WHERE is_active = TRUE;
+
+-- Table MEDIA
+CREATE TABLE media (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    draft_id UUID NOT NULL,
+    type media_type NOT NULL,
+    url VARCHAR(500) NOT NULL,
+    thumbnail_url VARCHAR(500),
+    size BIGINT NOT NULL,
+    mime_type VARCHAR(100) NOT NULL,
+    width INTEGER,
+    height INTEGER,
+    duration INTEGER,
+    metadata JSONB DEFAULT '{}',
+    upload_status upload_status DEFAULT 'pending',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (draft_id) REFERENCES drafts(id) ON DELETE CASCADE,
+    CONSTRAINT positive_size CHECK (size > 0),
+    CONSTRAINT valid_dimensions CHECK (
+        (width IS NULL AND height IS NULL) OR 
+        (width > 0 AND height > 0)
+    )
+);
+
+-- Index pour les performances
+CREATE INDEX idx_media_draft_id ON media(draft_id);
+CREATE INDEX idx_media_type ON media(type);
+
+-- Table DRAFT_PLATFORMS (association)
+CREATE TABLE draft_platforms (
+    draft_id UUID NOT NULL,
+    platform_id UUID NOT NULL,
+    adapted_content TEXT,
+    char_count INTEGER,
+    PRIMARY KEY (draft_id, platform_id),
+    FOREIGN KEY (draft_id) REFERENCES drafts(id) ON DELETE CASCADE,
+    FOREIGN KEY (platform_id) REFERENCES platforms(id)
+);
+
+-- Table PUBLICATIONS
+CREATE TABLE publications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    draft_id UUID NOT NULL,
+    platform_id UUID NOT NULL,
+    external_id VARCHAR(255),
+    published_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    status publication_status DEFAULT 'pending',
+    error_message TEXT,
+    retry_count INTEGER DEFAULT 0,
+    url VARCHAR(500),
+    FOREIGN KEY (draft_id) REFERENCES drafts(id),
+    FOREIGN KEY (platform_id) REFERENCES platforms(id),
+    CONSTRAINT max_retries CHECK (retry_count <= 5)
+);
+
+-- Index pour les performances
+CREATE INDEX idx_publications_draft_platform ON publications(draft_id, platform_id);
+CREATE INDEX idx_publications_status ON publications(status);
+CREATE INDEX idx_publications_published_at ON publications(published_at DESC);
+
+-- Table ANALYTICS
+CREATE TABLE analytics (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    publication_id UUID NOT NULL,
+    views INTEGER DEFAULT 0,
+    likes INTEGER DEFAULT 0,
+    shares INTEGER DEFAULT 0,
+    comments INTEGER DEFAULT 0,
+    clicks INTEGER DEFAULT 0,
+    engagement_rate DECIMAL(5,2),
+    reach INTEGER DEFAULT 0,
+    impressions INTEGER DEFAULT 0,
+    collected_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    raw_data JSONB DEFAULT '{}',
+    FOREIGN KEY (publication_id) REFERENCES publications(id) ON DELETE CASCADE,
+    CONSTRAINT non_negative_metrics CHECK (
+        views >= 0 AND likes >= 0 AND shares >= 0 AND 
+        comments >= 0 AND clicks >= 0 AND reach >= 0 AND impressions >= 0
+    )
+);
+
+-- Index pour les performances
+CREATE INDEX idx_analytics_publication_id ON analytics(publication_id);
+CREATE INDEX idx_analytics_collected_at ON analytics(collected_at DESC);
+
+-- Table AUDIT_LOG pour la traçabilité
+CREATE TABLE audit_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID,
+    action VARCHAR(100) NOT NULL,
+    entity_type VARCHAR(50),
+    entity_id UUID,
+    old_values JSONB,
+    new_values JSONB,
+    ip_address INET,
+    user_agent TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Index pour les performances
+CREATE INDEX idx_audit_logs_user_id ON audit_logs(user_id);
+CREATE INDEX idx_audit_logs_entity ON audit_logs(entity_type, entity_id);
+CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at DESC);
+
+-- Fonction pour mettre à jour automatiquement updated_at
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Triggers pour updated_at
+CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_drafts_updated_at BEFORE UPDATE ON drafts
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_social_connections_updated_at BEFORE UPDATE ON social_connections
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Vues pour simplifier les requêtes courantes
+CREATE VIEW user_connections AS
+SELECT 
+    u.id as user_id,
+    u.email,
+    u.name,
+    p.name as platform,
+    sc.is_active,
+    sc.expires_at,
+    sc.created_at as connected_at
+FROM users u
+JOIN social_connections sc ON u.id = sc.user_id
+JOIN platforms p ON sc.platform_id = p.id;
+
+CREATE VIEW publication_stats AS
+SELECT 
+    p.id as publication_id,
+    d.content,
+    pl.name as platform,
+    p.published_at,
+    p.status,
+    COALESCE(a.views, 0) as views,
+    COALESCE(a.likes, 0) as likes,
+    COALESCE(a.shares, 0) as shares,
+    COALESCE(a.engagement_rate, 0) as engagement_rate
+FROM publications p
+JOIN drafts d ON p.draft_id = d.id
+JOIN platforms pl ON p.platform_id = pl.id
+LEFT JOIN analytics a ON p.id = a.publication_id;
+
+-- Procédures stockées pour les opérations complexes
+CREATE OR REPLACE FUNCTION publish_draft(
+    p_draft_id UUID,
+    p_platform_ids UUID[]
+) RETURNS TABLE(platform_id UUID, status TEXT) AS $$
+DECLARE
+    v_platform_id UUID;
+    v_publication_id UUID;
+BEGIN
+    -- Vérifier que le brouillon existe
+    IF NOT EXISTS (SELECT 1 FROM drafts WHERE id = p_draft_id) THEN
+        RAISE EXCEPTION 'Draft not found';
+    END IF;
+    
+    -- Créer une publication pour chaque plateforme
+    FOREACH v_platform_id IN ARRAY p_platform_ids
+    LOOP
+        INSERT INTO publications (draft_id, platform_id, status)
+        VALUES (p_draft_id, v_platform_id, 'pending')
+        RETURNING id INTO v_publication_id;
+        
+        RETURN QUERY SELECT v_platform_id, 'pending'::TEXT;
+    END LOOP;
+    
+    -- Mettre à jour le statut du brouillon
+    UPDATE drafts SET status = 'publishing' WHERE id = p_draft_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Partitionnement pour les tables volumineuses
+-- Partitionnement de la table analytics par mois
+CREATE TABLE analytics_2024_01 PARTITION OF analytics
+    FOR VALUES FROM ('2024-01-01') TO ('2024-02-01');
+
+CREATE TABLE analytics_2024_02 PARTITION OF analytics
+    FOR VALUES FROM ('2024-02-01') TO ('2024-03-01');
+
+-- Politique de sécurité Row Level Security (RLS)
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE drafts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE social_connections ENABLE ROW LEVEL SECURITY;
+
+-- Politique pour les utilisateurs (peuvent voir/modifier seulement leurs données)
+CREATE POLICY users_policy ON users
+    FOR ALL TO application_user
+    USING (id = current_setting('app.current_user_id')::UUID);
+
+CREATE POLICY drafts_policy ON drafts
+    FOR ALL TO application_user
+    USING (user_id = current_setting('app.current_user_id')::UUID);
+
+CREATE POLICY social_connections_policy ON social_connections
+    FOR ALL TO application_user
+    USING (user_id = current_setting('app.current_user_id')::UUID);
+```
+
+================================================================================
+6. MISE EN PLACE DE LA BASE DE DONNÉES (COMPÉTENCE CP7)
+================================================================================
+
+6.1 CONFIGURATION DE L'ENVIRONNEMENT
+------------------------------------
+
+DÉVELOPPEMENT LOCAL:
+```yaml
+# docker-compose.yml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: publify_db
+    environment:
+      POSTGRES_USER: ${DB_USER:-publify}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secure_password}
+      POSTGRES_DB: ${DB_NAME:-publify_db}
+      POSTGRES_INITDB_ARGS: '--encoding=UTF8 --lc-collate=fr_FR.UTF-8 --lc-ctype=fr_FR.UTF-8'
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./scripts/seed-data.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-publify}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - publify_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: publify_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - publify_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  publify_network:
+    driver: bridge
+```
+
+6.2 CONFIGURATION PRISMA ORM
+-----------------------------
+
+```prisma
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["jsonProtocol"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+enum DraftStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHING
+  PUBLISHED
+  FAILED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  GIF
+}
+
+enum UploadStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum PublicationStatus {
+  SUCCESS
+  FAILED
+  PENDING
+}
+
+model User {
+  id              String    @id @default(uuid())
+  email           String    @unique
+  passwordHash    String    @map("password_hash")
+  name            String
+  role            UserRole  @default(USER)
+  mfaEnabled      Boolean   @default(false) @map("mfa_enabled")
+  mfaSecret       String?   @map("mfa_secret")
+  emailVerified   Boolean   @default(false) @map("email_verified")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  drafts          Draft[]
+  connections     SocialConnection[]
+  auditLogs       AuditLog[]
+  
+  @@index([email])
+  @@index([createdAt(sort: Desc)])
+  @@map("users")
+}
+
+model Platform {
+  id              String    @id @default(uuid())
+  name            String    @unique
+  iconUrl         String?   @map("icon_url")
+  maxChars        Int?      @map("max_chars")
+  supportsMedia   Boolean   @default(true) @map("supports_media")
+  supportsVideo   Boolean   @default(false) @map("supports_video")
+  apiEndpoint     String?   @map("api_endpoint")
+  rateLimit       Int?      @map("rate_limit")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  connections     SocialConnection[]
+  draftPlatforms  DraftPlatform[]
+  publications    Publication[]
+  
+  @@map("platforms")
+}
+
+model Draft {
+  id              String       @id @default(uuid())
+  userId          String       @map("user_id")
+  content         String
+  status          DraftStatus  @default(DRAFT)
+  scheduledAt     DateTime?    @map("scheduled_at")
+  metadata        Json         @default("{}")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media           Media[]
+  platforms       DraftPlatform[]
+  publications    Publication[]
+  
+  @@index([userId])
+  @@index([status])
+  @@index([scheduledAt])
+  @@map("drafts")
+}
+
+model SocialConnection {
+  id              String    @id @default(uuid())
+  userId          String    @map("user_id")
+  platformId      String    @map("platform_id")
+  accessToken     String    @map("access_token")
+  refreshToken    String?   @map("refresh_token")
+  expiresAt       DateTime? @map("expires_at")
+  scope           String[]
+  profileData     Json      @default("{}") @map("profile_data")
+  isActive        Boolean   @default(true) @map("is_active")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  platform        Platform  @relation(fields: [platformId], references: [id])
+  
+  @@unique([userId, platformId])
+  @@index([userId, platformId])
+  @@index([expiresAt])
+  @@map("social_connections")
+}
+
+model Media {
+  id              String        @id @default(uuid())
+  draftId         String        @map("draft_id")
+  type            MediaType
+  url             String
+  thumbnailUrl    String?       @map("thumbnail_url")
+  size            BigInt
+  mimeType        String        @map("mime_type")
+  width           Int?
+  height          Int?
+  duration        Int?
+  metadata        Json          @default("{}")
+  uploadStatus    UploadStatus  @default(PENDING) @map("upload_status")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  
+  draft           Draft         @relation(fields: [draftId], references: [id], onDelete: Cascade)
+  
+  @@index([draftId])
+  @@index([type])
+  @@map("media")
+}
+
+model DraftPlatform {
+  draftId         String    @map("draft_id")
+  platformId      String    @map("platform_id")
+  adaptedContent  String?   @map("adapted_content")
+  charCount       Int?      @map("char_count")
+  
+  draft           Draft     @relation(fields: [draftId], references: [id], onDelete: Cascade)
+  platform        Platform  @relation(fields: [platformId], references: [id])
+  
+  @@id([draftId, platformId])
+  @@map("draft_platforms")
+}
+
+model Publication {
+  id              String              @id @default(uuid())
+  draftId         String              @map("draft_id")
+  platformId      String              @map("platform_id")
+  externalId      String?             @map("external_id")
+  publishedAt     DateTime            @default(now()) @map("published_at")
+  status          PublicationStatus   @default(PENDING)
+  errorMessage    String?             @map("error_message")
+  retryCount      Int                 @default(0) @map("retry_count")
+  url             String?
+  
+  draft           Draft               @relation(fields: [draftId], references: [id])
+  platform        Platform            @relation(fields: [platformId], references: [id])
+  analytics       Analytics[]
+  
+  @@index([draftId, platformId])
+  @@index([status])
+  @@index([publishedAt(sort: Desc)])
+  @@map("publications")
+}
+
+model Analytics {
+  id              String       @id @default(uuid())
+  publicationId   String       @map("publication_id")
+  views           Int          @default(0)
+  likes           Int          @default(0)
+  shares          Int          @default(0)
+  comments        Int          @default(0)
+  clicks          Int          @default(0)
+  engagementRate  Decimal?     @map("engagement_rate") @db.Decimal(5, 2)
+  reach           Int          @default(0)
+  impressions     Int          @default(0)
+  collectedAt     DateTime     @default(now()) @map("collected_at")
+  rawData         Json         @default("{}") @map("raw_data")
+  
+  publication     Publication  @relation(fields: [publicationId], references: [id], onDelete: Cascade)
+  
+  @@index([publicationId])
+  @@index([collectedAt(sort: Desc)])
+  @@map("analytics")
+}
+
+model AuditLog {
+  id              String    @id @default(uuid())
+  userId          String?   @map("user_id")
+  action          String
+  entityType      String?   @map("entity_type")
+  entityId        String?   @map("entity_id")
+  oldValues       Json?     @map("old_values")
+  newValues       Json?     @map("new_values")
+  ipAddress       String?   @map("ip_address")
+  userAgent       String?   @map("user_agent")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  user            User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_logs")
+}
+```
+
+================================================================================
+7. DÉVELOPPEMENT DES COMPOSANTS BASE DE DONNÉES (COMPÉTENCE CP8)
+================================================================================
+
+7.1 PROCÉDURES STOCKÉES
+-----------------------
+
+```sql
+-- Procédure pour nettoyer les tokens expirés
+CREATE OR REPLACE FUNCTION cleanup_expired_tokens()
+RETURNS INTEGER AS $$
+DECLARE
+    deleted_count INTEGER;
+BEGIN
+    DELETE FROM social_connections
+    WHERE is_active = TRUE 
+    AND expires_at < CURRENT_TIMESTAMP
+    AND expires_at IS NOT NULL;
+    
+    GET DIAGNOSTICS deleted_count = ROW_COUNT;
+    
+    -- Logger l'action dans audit_log
+    INSERT INTO audit_logs (action, entity_type, old_values, created_at)
+    VALUES ('cleanup_expired_tokens', 'social_connection', 
+            jsonb_build_object('deleted_count', deleted_count), 
+            CURRENT_TIMESTAMP);
+    
+    RETURN deleted_count;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Procédure pour calculer les statistiques utilisateur
+CREATE OR REPLACE FUNCTION get_user_statistics(p_user_id UUID)
+RETURNS TABLE (
+    total_drafts INTEGER,
+    published_posts INTEGER,
+    scheduled_posts INTEGER,
+    total_views BIGINT,
+    total_likes BIGINT,
+    total_shares BIGINT,
+    avg_engagement_rate DECIMAL
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        COUNT(DISTINCT d.id)::INTEGER as total_drafts,
+        COUNT(DISTINCT CASE WHEN d.status = 'published' THEN d.id END)::INTEGER as published_posts,
+        COUNT(DISTINCT CASE WHEN d.status = 'scheduled' THEN d.id END)::INTEGER as scheduled_posts,
+        COALESCE(SUM(a.views), 0) as total_views,
+        COALESCE(SUM(a.likes), 0) as total_likes,
+        COALESCE(SUM(a.shares), 0) as total_shares,
+        COALESCE(AVG(a.engagement_rate), 0) as avg_engagement_rate
+    FROM drafts d
+    LEFT JOIN publications p ON d.id = p.draft_id
+    LEFT JOIN analytics a ON p.id = a.publication_id
+    WHERE d.user_id = p_user_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Fonction pour adapter le contenu selon la plateforme
+CREATE OR REPLACE FUNCTION adapt_content_for_platform(
+    p_content TEXT,
+    p_platform_name VARCHAR(50)
+) RETURNS TEXT AS $$
+DECLARE
+    v_max_chars INTEGER;
+    v_adapted_content TEXT;
+BEGIN
+    -- Récupérer la limite de caractères de la plateforme
+    SELECT max_chars INTO v_max_chars
+    FROM platforms
+    WHERE name = p_platform_name;
+    
+    IF v_max_chars IS NULL THEN
+        RETURN p_content;
+    END IF;
+    
+    v_adapted_content := p_content;
+    
+    -- Adapter selon la plateforme
+    CASE p_platform_name
+        WHEN 'Twitter' THEN
+            -- Tronquer et ajouter "..." si nécessaire
+            IF char_length(v_adapted_content) > v_max_chars - 3 THEN
+                v_adapted_content := substring(v_adapted_content, 1, v_max_chars - 3) || '...';
+            END IF;
+        WHEN 'LinkedIn' THEN
+            -- LinkedIn permet plus de contenu, pas de troncature
+            NULL;
+        WHEN 'Instagram' THEN
+            -- Instagram: ajouter des hashtags suggérés
+            IF position('#' in v_adapted_content) = 0 THEN
+                v_adapted_content := v_adapted_content || E'\n\n#publify #socialmedia #contentcreation';
+            END IF;
+    END CASE;
+    
+    RETURN v_adapted_content;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+7.2 TRIGGERS AVANCÉS
+--------------------
+
+```sql
+-- Trigger pour l'audit automatique
+CREATE OR REPLACE FUNCTION audit_trigger_function()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        INSERT INTO audit_logs (
+            user_id, action, entity_type, entity_id, 
+            new_values, created_at
+        ) VALUES (
+            current_setting('app.current_user_id', true)::UUID,
+            TG_OP,
+            TG_TABLE_NAME,
+            NEW.id,
+            to_jsonb(NEW),
+            CURRENT_TIMESTAMP
+        );
+        RETURN NEW;
+    ELSIF TG_OP = 'UPDATE' THEN
+        INSERT INTO audit_logs (
+            user_id, action, entity_type, entity_id,
+            old_values, new_values, created_at
+        ) VALUES (
+            current_setting('app.current_user_id', true)::UUID,
+            TG_OP,
+            TG_TABLE_NAME,
+            NEW.id,
+            to_jsonb(OLD),
+            to_jsonb(NEW),
+            CURRENT_TIMESTAMP
+        );
+        RETURN NEW;
+    ELSIF TG_OP = 'DELETE' THEN
+        INSERT INTO audit_logs (
+            user_id, action, entity_type, entity_id,
+            old_values, created_at
+        ) VALUES (
+            current_setting('app.current_user_id', true)::UUID,
+            TG_OP,
+            TG_TABLE_NAME,
+            OLD.id,
+            to_jsonb(OLD),
+            CURRENT_TIMESTAMP
+        );
+        RETURN OLD;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Appliquer le trigger aux tables importantes
+CREATE TRIGGER audit_users AFTER INSERT OR UPDATE OR DELETE ON users
+    FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
+
+CREATE TRIGGER audit_drafts AFTER INSERT OR UPDATE OR DELETE ON drafts
+    FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
+
+CREATE TRIGGER audit_publications AFTER INSERT OR UPDATE OR DELETE ON publications
+    FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
+
+-- Trigger pour valider le contenu avant insertion
+CREATE OR REPLACE FUNCTION validate_draft_content()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Vérifier que le contenu n'est pas vide
+    IF trim(NEW.content) = '' THEN
+        RAISE EXCEPTION 'Le contenu ne peut pas être vide';
+    END IF;
+    
+    -- Vérifier la longueur minimale
+    IF char_length(NEW.content) < 10 THEN
+        RAISE EXCEPTION 'Le contenu doit contenir au moins 10 caractères';
+    END IF;
+    
+    -- Détecter et bloquer le spam potentiel
+    IF NEW.content ~* '(viagra|casino|lottery|winner|congratulations you won)' THEN
+        RAISE EXCEPTION 'Contenu potentiellement indésirable détecté';
+    END IF;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER validate_draft_before_insert
+    BEFORE INSERT OR UPDATE ON drafts
+    FOR EACH ROW EXECUTE FUNCTION validate_draft_content();
+```
+
+7.3 OPTIMISATION DES PERFORMANCES
+---------------------------------
+
+```sql
+-- Index composites pour les requêtes fréquentes
+CREATE INDEX idx_drafts_user_status_scheduled 
+    ON drafts(user_id, status, scheduled_at) 
+    WHERE status = 'scheduled';
+
+CREATE INDEX idx_publications_draft_status_date 
+    ON publications(draft_id, status, published_at DESC);
+
+CREATE INDEX idx_analytics_publication_collected 
+    ON analytics(publication_id, collected_at DESC);
+
+-- Index de recherche full-text
+CREATE INDEX idx_drafts_content_search 
+    ON drafts USING gin(to_tsvector('french', content));
+
+-- Requête optimisée pour le dashboard
+CREATE OR REPLACE VIEW dashboard_summary AS
+WITH recent_publications AS (
+    SELECT 
+        p.id,
+        p.draft_id,
+        p.platform_id,
+        p.published_at,
+        p.status,
+        pl.name as platform_name
+    FROM publications p
+    JOIN platforms pl ON p.platform_id = pl.id
+    WHERE p.published_at > CURRENT_DATE - INTERVAL '7 days'
+),
+analytics_summary AS (
+    SELECT 
+        a.publication_id,
+        SUM(a.views) as total_views,
+        SUM(a.likes) as total_likes,
+        SUM(a.shares) as total_shares,
+        AVG(a.engagement_rate) as avg_engagement
+    FROM analytics a
+    WHERE a.collected_at > CURRENT_DATE - INTERVAL '7 days'
+    GROUP BY a.publication_id
+)
+SELECT 
+    rp.platform_name,
+    COUNT(DISTINCT rp.id) as posts_count,
+    COALESCE(SUM(a.total_views), 0) as views,
+    COALESCE(SUM(a.total_likes), 0) as likes,
+    COALESCE(SUM(a.total_shares), 0) as shares,
+    COALESCE(AVG(a.avg_engagement), 0) as engagement_rate
+FROM recent_publications rp
+LEFT JOIN analytics_summary a ON rp.id = a.publication_id
+GROUP BY rp.platform_name;
+
+-- Maintenance automatique
+CREATE OR REPLACE FUNCTION auto_vacuum_analytics()
+RETURNS void AS $$
+BEGIN
+    -- Supprimer les analytics de plus de 6 mois
+    DELETE FROM analytics 
+    WHERE collected_at < CURRENT_DATE - INTERVAL '6 months';
+    
+    -- VACUUM et ANALYZE pour optimiser
+    EXECUTE 'VACUUM ANALYZE analytics';
+END;
+$$ LANGUAGE plpgsql;
+```
+
+================================================================================
+8. COMPOSANTS MÉTIER (COMPÉTENCE CP11)
+================================================================================
+
+8.1 SERVICES MÉTIER
+-------------------
+
+SERVICE DE PUBLICATION:
+```typescript
+// src/services/PublicationService.ts
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { QueueService } from './queue.service';
+import { PlatformAdapterFactory } from './adapters/PlatformAdapterFactory';
+import { NotificationService } from './notification.service';
+
+@Injectable()
+export class PublicationService {
+  constructor(
+    private prisma: PrismaService,
+    private queueService: QueueService,
+    private adapterFactory: PlatformAdapterFactory,
+    private notificationService: NotificationService
+  ) {}
+
+  async publishDraft(draftId: string, userId: string): Promise<PublicationResult> {
+    // Transaction pour garantir la cohérence
+    return await this.prisma.$transaction(async (tx) => {
+      // 1. Récupérer le brouillon avec ses plateformes
+      const draft = await tx.draft.findFirst({
+        where: { id: draftId, userId },
+        include: {
+          platforms: { include: { platform: true } },
+          media: true,
+          user: { include: { connections: true } }
+        }
+      });
+
+      if (!draft) {
+        throw new NotFoundException('Draft not found');
+      }
+
+      // 2. Vérifier les connexions actives
+      const activeConnections = draft.user.connections.filter(
+        conn => conn.isActive && draft.platforms.some(
+          p => p.platformId === conn.platformId
+        )
+      );
+
+      if (activeConnections.length === 0) {
+        throw new BadRequestException('No active connections for selected platforms');
+      }
+
+      // 3. Créer les jobs de publication
+      const jobs = await Promise.all(
+        activeConnections.map(async (connection) => {
+          const platform = draft.platforms.find(
+            p => p.platformId === connection.platformId
+          );
+
+          // Adapter le contenu pour la plateforme
+          const adapter = this.adapterFactory.create(platform.platform.name);
+          const adaptedContent = await adapter.adaptContent({
+            content: draft.content,
+            media: draft.media,
+            metadata: draft.metadata
+          });
+
+          // Créer l'enregistrement de publication
+          const publication = await tx.publication.create({
+            data: {
+              draftId: draft.id,
+              platformId: connection.platformId,
+              status: 'PENDING'
+            }
+          });
+
+          // Ajouter à la queue
+          return await this.queueService.addPublicationJob({
+            publicationId: publication.id,
+            connectionId: connection.id,
+            content: adaptedContent,
+            platform: platform.platform.name
+          });
+        })
+      );
+
+      // 4. Mettre à jour le statut du brouillon
+      await tx.draft.update({
+        where: { id: draftId },
+        data: { status: 'PUBLISHING' }
+      });
+
+      // 5. Notifier l'utilisateur
+      await this.notificationService.send(userId, {
+        type: 'PUBLICATION_STARTED',
+        title: 'Publication en cours',
+        message: `Votre publication est en cours sur ${jobs.length} plateforme(s)`
+      });
+
+      return {
+        draftId,
+        jobs: jobs.map(j => ({ id: j.id, platform: j.data.platform })),
+        status: 'PROCESSING'
+      };
+    });
+  }
+
+  async schedulePublication(
+    draftId: string,
+    userId: string,
+    scheduledAt: Date
+  ): Promise<ScheduleResult> {
+    // Validation de la date
+    if (scheduledAt <= new Date()) {
+      throw new BadRequestException('Scheduled date must be in the future');
+    }
+
+    // Calculer le délai
+    const delay = scheduledAt.getTime() - Date.now();
+
+    // Ajouter à la queue avec délai
+    const job = await this.queueService.addDelayedJob({
+      type: 'SCHEDULED_PUBLICATION',
+      data: { draftId, userId },
+      delay
+    });
+
+    // Mettre à jour le brouillon
+    await this.prisma.draft.update({
+      where: { id: draftId },
+      data: {
+        status: 'SCHEDULED',
+        scheduledAt
+      }
+    });
+
+    return {
+      draftId,
+      scheduledAt,
+      jobId: job.id
+    };
+  }
+
+  async retryFailedPublication(publicationId: string): Promise<void> {
+    const publication = await this.prisma.publication.findUnique({
+      where: { id: publicationId },
+      include: {
+        draft: true,
+        platform: true
+      }
+    });
+
+    if (!publication || publication.status !== 'FAILED') {
+      throw new BadRequestException('Invalid publication for retry');
+    }
+
+    if (publication.retryCount >= 5) {
+      throw new BadRequestException('Maximum retry attempts reached');
+    }
+
+    // Incrémenter le compteur de retry
+    await this.prisma.publication.update({
+      where: { id: publicationId },
+      data: {
+        retryCount: { increment: 1 },
+        status: 'PENDING'
+      }
+    });
+
+    // Réajouter à la queue
+    await this.queueService.addPublicationJob({
+      publicationId,
+      retry: true,
+      attemptNumber: publication.retryCount + 1
+    });
+  }
+}
+```
+
+SERVICE D'ANALYTICS:
+```typescript
+// src/services/AnalyticsService.ts
+@Injectable()
+export class AnalyticsService {
+  private readonly logger = new Logger(AnalyticsService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private platformAdapterFactory: PlatformAdapterFactory,
+    private cacheService: CacheService
+  ) {}
+
+  async collectAnalytics(publicationId: string): Promise<Analytics> {
+    const publication = await this.prisma.publication.findUnique({
+      where: { id: publicationId },
+      include: {
+        platform: true,
+        draft: { include: { user: { include: { connections: true } } } }
+      }
+    });
+
+    if (!publication || !publication.externalId) {
+      throw new NotFoundException('Publication not found or not published');
+    }
+
+    // Récupérer la connexion active
+    const connection = publication.draft.user.connections.find(
+      c => c.platformId === publication.platformId && c.isActive
+    );
+
+    if (!connection) {
+      throw new BadRequestException('No active connection for platform');
+    }
+
+    // Utiliser l'adapter pour récupérer les métriques
+    const adapter = this.platformAdapterFactory.create(publication.platform.name);
+    const metrics = await adapter.getMetrics(
+      publication.externalId,
+      connection.accessToken
+    );
+
+    // Calculer le taux d'engagement
+    const engagementRate = this.calculateEngagementRate(metrics);
+
+    // Sauvegarder en base
+    const analytics = await this.prisma.analytics.create({
+      data: {
+        publicationId,
+        views: metrics.views || 0,
+        likes: metrics.likes || 0,
+        shares: metrics.shares || 0,
+        comments: metrics.comments || 0,
+        clicks: metrics.clicks || 0,
+        reach: metrics.reach || 0,
+        impressions: metrics.impressions || 0,
+        engagementRate,
+        rawData: metrics.raw || {}
+      }
+    });
+
+    // Mettre en cache pour accès rapide
+    await this.cacheService.set(
+      `analytics:${publicationId}`,
+      analytics,
+      300 // 5 minutes
+    );
+
+    return analytics;
+  }
+
+  private calculateEngagementRate(metrics: PlatformMetrics): number {
+    const interactions = (metrics.likes || 0) + 
+                        (metrics.shares || 0) + 
+                        (metrics.comments || 0) + 
+                        (metrics.clicks || 0);
+    
+    const reach = metrics.reach || metrics.impressions || 1;
+    
+    return Math.round((interactions / reach) * 10000) / 100; // Pourcentage avec 2 décimales
+  }
+
+  async getAggregatedAnalytics(
+    userId: string,
+    dateRange: DateRange
+  ): Promise<AggregatedAnalytics> {
+    // Vérifier le cache
+    const cacheKey = `aggregated:${userId}:${dateRange.from}:${dateRange.to}`;
+    const cached = await this.cacheService.get<AggregatedAnalytics>(cacheKey);
+    
+    if (cached) {
+      return cached;
+    }
+
+    // Requête optimisée avec agrégation
+    const result = await this.prisma.$queryRaw<AggregatedAnalytics[]>`
+      SELECT 
+        p.name as platform,
+        COUNT(DISTINCT pub.id) as total_posts,
+        COALESCE(SUM(a.views), 0) as total_views,
+        COALESCE(SUM(a.likes), 0) as total_likes,
+        COALESCE(SUM(a.shares), 0) as total_shares,
+        COALESCE(SUM(a.comments), 0) as total_comments,
+        COALESCE(AVG(a.engagement_rate), 0) as avg_engagement_rate,
+        COALESCE(SUM(a.reach), 0) as total_reach
+      FROM platforms p
+      LEFT JOIN publications pub ON p.id = pub.platform_id
+      LEFT JOIN drafts d ON pub.draft_id = d.id
+      LEFT JOIN analytics a ON pub.id = a.publication_id
+      WHERE d.user_id = ${userId}::uuid
+        AND pub.published_at BETWEEN ${dateRange.from} AND ${dateRange.to}
+      GROUP BY p.id, p.name
+      ORDER BY total_posts DESC
+    `;
+
+    // Calculer les totaux
+    const totals = result.reduce((acc, platform) => ({
+      totalPosts: acc.totalPosts + platform.total_posts,
+      totalViews: acc.totalViews + platform.total_views,
+      totalLikes: acc.totalLikes + platform.total_likes,
+      totalShares: acc.totalShares + platform.total_shares,
+      totalComments: acc.totalComments + platform.total_comments,
+      totalReach: acc.totalReach + platform.total_reach
+    }), {
+      totalPosts: 0,
+      totalViews: 0,
+      totalLikes: 0,
+      totalShares: 0,
+      totalComments: 0,
+      totalReach: 0
+    });
+
+    const aggregated = {
+      dateRange,
+      platforms: result,
+      totals,
+      averageEngagementRate: result.reduce((sum, p) => 
+        sum + p.avg_engagement_rate, 0) / result.length || 0
+    };
+
+    // Mettre en cache
+    await this.cacheService.set(cacheKey, aggregated, 3600); // 1 heure
+
+    return aggregated;
+  }
+
+  async exportAnalyticsReport(
+    userId: string,
+    format: 'csv' | 'pdf' | 'excel',
+    dateRange: DateRange
+  ): Promise<Buffer> {
+    const data = await this.getDetailedAnalytics(userId, dateRange);
+
+    switch (format) {
+      case 'csv':
+        return this.generateCSV(data);
+      case 'pdf':
+        return this.generatePDF(data);
+      case 'excel':
+        return this.generateExcel(data);
+      default:
+        throw new BadRequestException('Unsupported export format');
+    }
+  }
+
+  private async getDetailedAnalytics(
+    userId: string,
+    dateRange: DateRange
+  ): Promise<DetailedAnalytics[]> {
+    return await this.prisma.$queryRaw`
+      SELECT 
+        d.content,
+        p.name as platform,
+        pub.published_at,
+        pub.url,
+        a.views,
+        a.likes,
+        a.shares,
+        a.comments,
+        a.clicks,
+        a.engagement_rate,
+        a.reach,
+        a.impressions,
+        a.collected_at
+      FROM analytics a
+      JOIN publications pub ON a.publication_id = pub.id
+      JOIN drafts d ON pub.draft_id = d.id
+      JOIN platforms p ON pub.platform_id = p.id
+      WHERE d.user_id = ${userId}::uuid
+        AND pub.published_at BETWEEN ${dateRange.from} AND ${dateRange.to}
+      ORDER BY pub.published_at DESC
+    `;
+  }
+}
+```
+
+================================================================================
+9. GESTION DE PROJET ET COLLABORATION (COMPÉTENCE CP9)
+================================================================================
+
+9.1 ORGANISATION GITHUB
+-----------------------
+
+STRUCTURE DES BRANCHES:
+```
+main (production)
+├── develop (intégration)
+│   ├── feature/auth-system
+│   ├── feature/social-connectors
+│   ├── feature/analytics-dashboard
+│   ├── feature/media-upload
+│   └── feature/scheduling-system
+├── hotfix/security-patch-v1.2.1
+└── release/v1.3.0
+```
+
+WORKFLOW GIT:
+```bash
+# Création d'une nouvelle feature
+git checkout develop
+git pull origin develop
+git checkout -b feature/nouvelle-fonctionnalite
+
+# Développement avec commits atomiques
+git add src/components/NewComponent.tsx
+git commit -m "feat(components): add NewComponent with base structure"
+
+git add src/services/newService.ts
+git commit -m "feat(services): implement new service logic"
+
+git add tests/newComponent.test.tsx
+git commit -m "test(components): add unit tests for NewComponent"
+
+# Push et création de Pull Request
+git push -u origin feature/nouvelle-fonctionnalite
+
+# Après review et approbation
+git checkout develop
+git merge --no-ff feature/nouvelle-fonctionnalite
+git push origin develop
+```
+
+9.2 GITHUB ACTIONS CI/CD
+------------------------
+
+```yaml
+# .github/workflows/ci.yml
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '18.x'
+  POSTGRES_VERSION: '15'
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run ESLint
+        run: npm run lint
+      
+      - name: Run Prettier check
+        run: npm run format:check
+
+  type-check:
+    name: TypeScript Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run TypeScript compiler
+        run: npm run type-check
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:${{ env.POSTGRES_VERSION }}
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: publify_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Setup test database
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/publify_test
+        run: |
+          npx prisma migrate deploy
+          npx prisma db seed
+      
+      - name: Run unit tests
+        run: npm run test:unit
+      
+      - name: Run integration tests
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/publify_test
+          REDIS_URL: redis://localhost:6379
+        run: npm run test:integration
+      
+      - name: Run E2E tests
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/publify_test
+          REDIS_URL: redis://localhost:6379
+        run: npm run test:e2e
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+      
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: [lint, type-check, test]
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build application
+        run: npm run build
+      
+      - name: Build Docker image
+        run: |
+          docker build -t publify:${{ github.sha }} .
+          docker tag publify:${{ github.sha }} publify:latest
+      
+      - name: Save Docker image
+        run: docker save publify:latest > publify.tar
+      
+      - name: Upload Docker artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-image
+          path: publify.tar
+          retention-days: 7
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+      
+      - name: Download Docker artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-image
+      
+      - name: Load Docker image
+        run: docker load < publify.tar
+      
+      - name: Push to ECR
+        run: |
+          aws ecr get-login-password | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+          docker tag publify:latest ${{ secrets.ECR_REGISTRY }}/publify:staging-${{ github.sha }}
+          docker push ${{ secrets.ECR_REGISTRY }}/publify:staging-${{ github.sha }}
+      
+      - name: Deploy to ECS
+        run: |
+          aws ecs update-service \
+            --cluster publify-staging \
+            --service publify-app \
+            --force-new-deployment
+```
+
+9.3 CONVENTIONS DE COMMIT
+-------------------------
+
+```markdown
+# .gitmessage
+# Type(scope): Subject (max 50 chars)
+
+# Body (max 72 chars per line)
+
+# Footer
+
+# Types:
+# - feat: New feature
+# - fix: Bug fix
+# - docs: Documentation changes
+# - style: Code style changes (formatting, etc)
+# - refactor: Code refactoring
+# - test: Test additions or modifications
+# - chore: Build process or auxiliary tool changes
+# - perf: Performance improvements
+
+# Scopes:
+# - auth: Authentication system
+# - api: API endpoints
+# - ui: User interface
+# - db: Database
+# - services: Business services
+# - deps: Dependencies
+```
+
+EXEMPLES DE COMMITS:
+```bash
+feat(auth): implement OAuth2 flow for LinkedIn connection
+
+- Add LinkedIn OAuth strategy
+- Create callback handling
+- Store encrypted tokens in database
+- Add token refresh mechanism
+
+Closes #123
+
+---
+
+fix(api): handle rate limiting for Twitter API
+
+Previously, the application would crash when hitting Twitter's
+rate limits. This commit adds:
+- Exponential backoff retry logic
+- Rate limit tracking
+- User notification on limit reached
+
+Fixes #456
+
+---
+
+test(services): add comprehensive tests for PublicationService
+
+- Unit tests for all public methods
+- Integration tests with real database
+- Mock external API calls
+- Test error scenarios
+
+Coverage increased from 72% to 89%
+```

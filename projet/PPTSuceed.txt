@@ -1,0 +1,174 @@
+Tibet Restaurant
+Introduction
+L'objectif principal est de développer une application web qui permet :
+• Aux clients de passer des commandes en ligne, de suivre leur état,
+et de payer via une plateforme sécurisée.
+• Aux employés du restaurant de gérer les commandes et d'encaisser
+les paiements directement au restaurant en différents moyens de
+paiement comme carte bancaire, Ticket Restaurant et en espèces.
+• Aux administrateurs de gérer les menus, les utilisateurs et de
+consulter des rapports de performances.
+Competence couverte
+• Configuration d’environment du travail pour mon projet.
+• Maquetter et développer une interface utilisateur responsive.
+• Développer la partie back-end de l'application et mettre en
+place une basse de donnée.
+• Concevoir une application.
+• Gestion de projet.
+• Préparer l'application pour le déploiement et la déployer.
+• Préparer l’environment de test et de tester l’application.
+Cahier de
+charges
+Zoning
+Wireframe
+Lien Figma
+Planification
+Etudes des different personnas
+1. Le Professionnel Occupé
+Nom : Emily Harper
+Âge : 32 ans
+Profession : Responsable Marketing
+Niveau de maîtrise technologique : Élevé
+Objectifs :
+Commander rapidement des repas pendant les journées
+chargées ou les soirées
+tardives au bureau.
+Accéder à une grande variété de cuisines pour satisfaire
+différents goûts.
+Programmer des commandes à l’avance pour les adapter à ses
+réunions.
+Points sensibles:
+Retards de livraison aux heures de pointe.
+Manque d'options saines pour une livraison rapide.
+Comportements :
+Commande fréquemment le déjeuner en semaine.
+Utilise des fonctionnalités comme la commande rapide ou le
+suivi des livraisons.
+Privilégie les applications avec des programmes de fidélité et des
+réductions.
+2. L’Étudiant Universitaire
+Nom : Jordan Lewis
+Âge : 21 ans
+Profession : Étudiant
+Niveau de maîtrise technologique : Moyen-Élevé
+Objectifs :
+Commander des repas abordables qui respectent un budget serré.
+Diviser les paiements facilement lors des commandes entre amis.
+Trouver des options tardives pour les sessions d’étude nocturnes.
+Points sensibles :
+Frais de livraison élevés et exigences de commande minimale.
+Manque d'options végétariennes ou véganes autour du campus.
+Comportements :
+Recherche souvent des promotions et des réductions.
+Commande principalement le soir ou le week-end.
+Partage les commandes avec des amis grâce à des fonctionnalités
+de commande
+groupée.
+3.La mère du Foyer
+Nom : Sarah Thompson
+Âge : 40 ans
+Profession : Parent au foyer
+Niveau de maîtrise technologique : Moyen
+Objectifs :
+Trouver des repas adaptés aux enfants pour toute la famille.
+Identifier des menus familiaux ou des offres groupées pour économiser.
+Suivre les temps de livraison pour organiser les repas familiaux.
+Points sensibles:
+Qualité incohérente ou articles manquants dans les grosses commandes.
+Difficulté à coordonner des repas pour des mangeurs difficiles.
+Comportements :
+Commande des repas familiaux ou en grande quantité pour le dîner.
+Consulte souvent les avis des utilisateurs pour garantir la qualité.
+Programme occasionnellement des commandes pour des événements
+spéciaux.
+Diagramme
+de cas
+d’utilization
+UML
+Diagramme
+de sequence
+UML
+Diagramme
+de Class
+UML
+Diagramme Merise: Dictionnaire des
+données
+Diagramme
+MCD
+Merise
+Diagramme
+MLD
+Merise
+Developpement et realization
+• Utilisation de MVC design pattern.
+• PHP 8.3, Symfony 7.2
+• Integration de paiement securié par STRIPE
+• Utilisation de tailwind css pour la partie front du projet.
+BDD
+Fixtures
+Fonctionalité principale: Ajout dans la pannier
+Fonctionalité principale: Rétirer de pannier
+Fonctionalité
+principale:
+Paiement
+par Stripe
+Fonctionalité
+principale:
+Payment
+Webhooks
+Fonctionalité principale: Paiement par Stripe
+Fonctionalité principale: Verification de User pour
+autorisation
+Fonctionalité principale: Verification de User pour
+autorisation
+Fonctionalité principale: Verification de User pour
+autorisation
+Versionning
+Test Unitaire
+Test
+Integration
+Test
+Fonctionnel
+Securité
+• Contraintes au niveau des entités
+• Contrôle d'accès basé sur les rôles
+• Contrôle d'accès dans les templates
+• Contraintes des paramètres.
+• Contraintes dans la formulaire
+• Bases de données séparées
+• Protection des données personnelles
+• Pratiques de stockage sécurisé
+• Communication sécurisée client-serveur
+• Validation des entrées utilisateur
+• Traitement sécurisé des paiements
+• Contrôle d'accès dans le fichier
+security.yaml
+• Politique de mot de passe strict
+• Google reCAPTCHA v3
+• Protection CSRF
+Deploiment
+• Serveur Mutualisé : Hostinger.
+• Création des différentes dépendances .htaccess
+• Installation des différentes dépendances
+• Préparation de l’environnement de production.
+Veille de Securité
+• Utilisation d’outil OWASP ZAP (Zed Attack Proxy)
+Veille de Securité
+• Utilisation d’outil OWASP ZAP (Zed Attack Proxy)
+Veille de Securité: Solution implementé.
+Sécurisation contre les injections SQL
+Mesures de protection implémentées
+• Utilisation de Doctrine ORM
+• Paramètres préparés avec QueryBuilder
+Piste d’amelioration
+- Rendre le site web multilingue afin d'en améliorer
+l'accessibilité pour tous les publics
+- Ajouter plus de fonctionnalités.
+Conclusion
+• Remercier l’équipe de Prepavenir.
+• Expérience sur le projet m’as apporté différente compétence.
+• Le projet j’ai pu terminé avec sucés, intégrant les diffèrent fonctionnalité pour la
+commande par client, Employée et l’admin en plus de la gestion des diffèrent entité
+de mon projet et aussi accessible sous des diffèrent formats d’écran avec
+l'intégration de la partie responsive du site.
+Mon parcours en continuité

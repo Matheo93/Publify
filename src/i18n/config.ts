@@ -9,6 +9,7 @@ export interface Dictionary {
     signInWithLinkedIn: string;
     signIn: {
       title: string;
+      email: string;
       username: string;
       password: string;
       button: string;
@@ -16,6 +17,7 @@ export interface Dictionary {
     };
     signUp: {
       title: string;
+      name: string;
       username: string;
       email: string;
       password: string;
@@ -759,6 +761,7 @@ export const dictionaries: Record<ValidLocale, Dictionary> = {
     signInWithLinkedIn: "Sign in with LinkedIn",
     signIn: {
       title: "Sign in",
+      email: "Email",
       username: "Username",
       password: "Password",
       button: "Sign in",
@@ -766,6 +769,7 @@ export const dictionaries: Record<ValidLocale, Dictionary> = {
     },
     signUp: {
       title: "Sign up",
+      name: "Name",
       username: "Username",
       email: "Email",
       password: "Password",
@@ -1184,6 +1188,7 @@ export const dictionaries: Record<ValidLocale, Dictionary> = {
     signInWithLinkedIn: "Se connecter avec LinkedIn",
     signIn: {
       title: "Connexion",
+      email: "Email",
       username: "Nom d'utilisateur",
       password: "Mot de passe",
       button: "Se connecter",
@@ -1191,6 +1196,7 @@ export const dictionaries: Record<ValidLocale, Dictionary> = {
     },
     signUp: {
       title: "Inscription",
+      name: "Nom",
       username: "Nom d'utilisateur",
       email: "Email",
       password: "Mot de passe",

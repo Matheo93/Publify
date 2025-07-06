@@ -1,0 +1,657 @@
+================================================================================
+PARTIE 2 - DIAGRAMMES DE CLASSES ET ARCHITECTURE EN COUCHES
+================================================================================
+
+3.4 DIAGRAMME DE CLASSES COMPLET
+---------------------------------
+
+```
++-----------------------------------+
+|            <<interface>>          |
+|         IAuthenticatable          |
++-----------------------------------+
+| + authenticate(): Promise<User>   |
+| + logout(): Promise<void>         |
+| + refreshToken(): Promise<Token>  |
++-----------------------------------+
+                 △
+                 |
+    +------------+------------+
+    |                         |
++-------------------+  +----------------------+
+|      User         |  |   SocialConnection   |
++-------------------+  +----------------------+
+| - id: UUID        |  | - id: UUID           |
+| - email: string   |  | - userId: UUID       |
+| - passwordHash: s |  | - platform: Platform |
+| - name: string    |  | - accessToken: string|
+| - role: UserRole  |  | - refreshToken: str  |
+| - mfaEnabled: bool|  | - expiresAt: Date    |
+| - createdAt: Date |  | - scope: string[]    |
+| - updatedAt: Date |  +----------------------+
++-------------------+  | + connect(): Promise |
+| + validatePass()  |  | + disconnect(): void |
+| + enableMFA()     |  | + refreshAuth(): P   |
+| + updateProfile() |  | + isExpired(): bool  |
++-------------------+  +----------------------+
+        |1                      |*
+        |                       |
+        |*                      |
++-------------------+           |
+|      Draft        |           |
++-------------------+           |
+| - id: UUID        |           |
+| - userId: UUID    |           |
+| - content: string |           |
+| - status: Status  |           |
+| - scheduledAt: D  |           |
+| - platforms: P[]  |           |
+| - media: Media[]  |           |
+| - metadata: JSON  |           |
++-------------------+           |
+| + publish(): P    |           |
+| + schedule(): P   |           |
+| + validate(): b   |           |
+| + duplicate(): D  |           |
++-------------------+           |
+        |*                      |
+        |                       |
+        |1                      |
++-------------------+    +----------------------+
+|   Publication     |    |    PlatformAdapter   |
++-------------------+    +----------------------+
+| - id: UUID        |    | <<abstract>>         |
+| - draftId: UUID   |    | - platform: Platform |
+| - platform: Plat  |    +----------------------+
+| - publishedAt: D  |    | + adaptContent(): C  |
+| - externalId: str |    | + publish(): Promise |
+| - metrics: Metric |    | + delete(): Promise  |
+| - status: PubStat |    | + getMetrics(): P    |
++-------------------+    +----------------------+
+| + updateMetrics() |             △
+| + getEngagement() |             |
+| + retry(): Promise|    +--------+--------+------+------+
++-------------------+    |        |        |      |      |
+                        |        |        |      |      |
+                 +----------+ +-------+ +-------+ +----------+
+                 |LinkedIn  | |Twitter| |Facebook| |Instagram |
+                 |Adapter   | |Adapter| |Adapter | |Adapter   |
+                 +----------+ +-------+ +-------+ +----------+
+                 | + post() | |+tweet()| |+share()| |+ post() |
+                 | + delete()| |+delete()| |+delete()| |+delete()|
+                 +----------+ +-------+ +-------+ +----------+
+
++-------------------+    +----------------------+
+|      Media        |    |      Analytics       |
++-------------------+    +----------------------+
+| - id: UUID        |    | - id: UUID           |
+| - type: MediaType |    | - userId: UUID       |
+| - url: string     |    | - period: DateRange  |
+| - size: number    |    | - metrics: Metrics   |
+| - mimeType: str   |    | - platforms: P[]     |
+| - metadata: JSON  |    +----------------------+
++-------------------+    | + calculate(): void  |
+| + upload(): P     |    | + export(): Report   |
+| + validate(): b   |    | + compare(): Comp    |
+| + optimize(): M   |    +----------------------+
+| + getThumbnail()  |
++-------------------+
+
++-------------------+    +----------------------+
+|   QueueService    |    |   NotificationService|
++-------------------+    +----------------------+
+| - queue: Queue    |    | - channels: Channel[]|
+| - workers: W[]    |    | - templates: Temp[]  |
++-------------------+    +----------------------+
+| + enqueue(): Job  |    | + send(): Promise    |
+| + process(): void |    | + broadcast(): void  |
+| + retry(): Promise|    | + schedule(): Promise|
+| + getStatus(): S  |    +----------------------+
++-------------------+
+```
+
+3.5 DIAGRAMME D'ACTIVITÉS - PROCESSUS DE PUBLICATION
+-----------------------------------------------------
+
+```
+        [START]
+           |
+           v
+    (Utilisateur connecté?)
+           |
+      Non  |  Oui
+    -------|-------
+    |             |
+    v             v
+[Redirection] [Dashboard]
+[Login]           |
+    |             v
+    |      (Créer publication)
+    |             |
+    |             v
+    |      [Éditeur contenu]
+    |             |
+    |             v
+    |      <Saisie contenu>
+    |             |
+    |             v
+    |      (Ajouter média?)
+    |             |
+    |        Oui  |  Non
+    |      -------|-------
+    |      |             |
+    |      v             |
+    |  [Upload média]    |
+    |      |             |
+    |      v             |
+    |  <Validation>      |
+    |      |             |
+    |      |<------------|
+    |      v
+    |  (Sélection plateformes)
+    |      |
+    |      v
+    |  [Preview adapté]
+    |      |
+    |      v
+    |  (Type publication?)
+    |      |
+    |  Immédiat | Planifié
+    |  ---------|----------
+    |  |                  |
+    |  v                  v
+    |[Publication]   [Planification]
+    |  |                  |
+    |  v                  v
+    |<Queue système> <Scheduler>
+    |  |                  |
+    |  v                  |
+    |[Worker process]     |
+    |  |                  |
+    |  v                  |
+    |(Pour chaque plateforme)
+    |  |                  |
+    |  v                  |
+    |[API Call]           |
+    |  |                  |
+    |  v                  |
+    |<Succès?>            |
+    |  |                  |
+    |Oui|Non              |
+    |  | |                |
+    |  v v                |
+    |[MAJ][Retry]         |
+    |  | |                |
+    |  | v                |
+    |  |<Max retries?>    |
+    |  | |                |
+    |  | Non|Oui          |
+    |  | |  |             |
+    |  | |  v             |
+    |  | |[Échec notif]  |
+    |  | |  |             |
+    |  v v  v             |
+    |[Notification]<------|
+    |  |
+    |  v
+    | [END]
+```
+
+3.6 DIAGRAMME DE COMPOSANTS
+----------------------------
+
+```
++----------------------------------------------------------+
+|                    FRONTEND (Next.js)                    |
++----------------------------------------------------------+
+| +-----------------+ +------------------+ +--------------+|
+| |   Pages/Routes  | |    Components    | |   Services   ||
+| +-----------------+ +------------------+ +--------------+|
+| | - LoginPage     | | - Header         | | - AuthService||
+| | - Dashboard     | | - Editor         | | - APIClient  ||
+| | - SettingsPage  | | - MediaUploader  | | - WebSocket  ||
+| | - AnalyticsPage | | - Calendar       | | - Storage    ||
+| +-----------------+ +------------------+ +--------------+|
++----------------------------------------------------------+
+                            |
+                            | HTTPS/WSS
+                            v
++----------------------------------------------------------+
+|                    API GATEWAY (Nginx)                   |
++----------------------------------------------------------+
+| +------------------+ +------------------+ +--------------+|
+| |   Rate Limiter   | |   Load Balancer  | |     WAF      ||
+| +------------------+ +------------------+ +--------------+|
++----------------------------------------------------------+
+                            |
+                            v
++----------------------------------------------------------+
+|                   BACKEND (Node.js)                      |
++----------------------------------------------------------+
+| +-----------------+ +------------------+ +--------------+|
+| |   API Routes    | |    Middleware    | |   Services   ||
+| +-----------------+ +------------------+ +--------------+|
+| | - AuthRoutes    | | - Authentication | | - AuthService||
+| | - DraftRoutes   | | - Authorization  | | - DraftService|
+| | - MediaRoutes   | | - Validation     | | - MediaService|
+| | - StatsRoutes   | | - ErrorHandler   | | - QueueService|
+| +-----------------+ +------------------+ +--------------+|
++----------------------------------------------------------+
+         |                    |                    |
+         v                    v                    v
++----------------+ +-------------------+ +------------------+
+|   PostgreSQL   | |      Redis        | |    AWS S3        |
++----------------+ +-------------------+ +------------------+
+| - Users        | | - Sessions        | | - Media files    |
+| - Drafts       | | - Cache           | | - Thumbnails     |
+| - Publications | | - Queue           | | - Exports        |
+| - Analytics    | | - Rate limits     | |                  |
++----------------+ +-------------------+ +------------------+
+```
+
+3.7 DIAGRAMME DE DÉPLOIEMENT DÉTAILLÉ
+--------------------------------------
+
+```
+                        [UTILISATEURS]
+                             |
+                             | HTTPS
+                             v
+                    +------------------+
+                    |   CloudFlare     |
+                    |   (CDN + DDoS)   |
+                    +------------------+
+                             |
+                             v
+                    +------------------+
+                    |   AWS Route 53   |
+                    |   (DNS)          |
+                    +------------------+
+                             |
+                             v
+    +-------------------------------------------------------+
+    |                    AWS VPC (10.0.0.0/16)             |
+    |  +------------------------------------------------+  |
+    |  |              PUBLIC SUBNET (10.0.1.0/24)       |  |
+    |  |  +------------------+    +------------------+  |  |
+    |  |  |   ALB           |    |   NAT Gateway    |  |  |
+    |  |  | (Load Balancer) |    |                  |  |  |
+    |  |  +------------------+    +------------------+  |  |
+    |  +------------------------------------------------+  |
+    |                         |                             |
+    |  +------------------------------------------------+  |
+    |  |            PRIVATE SUBNET (10.0.2.0/24)        |  |
+    |  |  +------------------+    +------------------+  |  |
+    |  |  |   EC2 Instance   |    |   EC2 Instance   |  |  |
+    |  |  |   Docker Host    |    |   Docker Host    |  |  |
+    |  |  | +-------------+  |    | +-------------+  |  |  |
+    |  |  | | Next.js App |  |    | | Next.js App |  |  |  |
+    |  |  | | Container   |  |    | | Container   |  |  |  |
+    |  |  | +-------------+  |    | +-------------+  |  |  |
+    |  |  | +-------------+  |    | +-------------+  |  |  |
+    |  |  | | Worker      |  |    | | Worker      |  |  |  |
+    |  |  | | Container   |  |    | | Container   |  |  |  |
+    |  |  | +-------------+  |    | +-------------+  |  |  |
+    |  |  +------------------+    +------------------+  |  |
+    |  +------------------------------------------------+  |
+    |                         |                             |
+    |  +------------------------------------------------+  |
+    |  |           DATABASE SUBNET (10.0.3.0/24)        |  |
+    |  |  +------------------+    +------------------+  |  |
+    |  |  |   RDS PostgreSQL |    |  ElastiCache     |  |  |
+    |  |  |   Multi-AZ       |    |  Redis Cluster   |  |  |
+    |  |  +------------------+    +------------------+  |  |
+    |  +------------------------------------------------+  |
+    +-------------------------------------------------------+
+                             |
+                    External Services
+                             |
+    +----------------+----------------+----------------+
+    |                |                |                |
+    v                v                v                v
++----------+   +-----------+   +------------+   +----------+
+| AWS S3   |   | AWS SES   |   | LinkedIn   |   | Twitter  |
+| Storage  |   | Email     |   | API        |   | API      |
++----------+   +-----------+   +------------+   +----------+
+```
+
+================================================================================
+4. ARCHITECTURE EN COUCHES (COMPÉTENCE CP12)
+================================================================================
+
+4.1 ARCHITECTURE HEXAGONALE (CLEAN ARCHITECTURE)
+------------------------------------------------
+
+```
++----------------------------------------------------------+
+|                    COUCHE PRÉSENTATION                   |
+| +------------------------------------------------------+ |
+| |  Controllers  |   DTOs   |  Validators  |  Mappers  | |
+| +------------------------------------------------------+ |
++----------------------------------------------------------+
+                            |
+                            | Interface Adapters
+                            v
++----------------------------------------------------------+
+|                 COUCHE APPLICATION                       |
+| +------------------------------------------------------+ |
+| | Use Cases | Commands | Queries | Event Handlers     | |
+| +------------------------------------------------------+ |
++----------------------------------------------------------+
+                            |
+                            | Application Business Rules
+                            v
++----------------------------------------------------------+
+|                    COUCHE DOMAINE                        |
+| +------------------------------------------------------+ |
+| |  Entities  |  Value Objects  |  Domain Services     | |
+| |  Aggregates | Repositories | Domain Events          | |
+| +------------------------------------------------------+ |
++----------------------------------------------------------+
+                            |
+                            | Enterprise Business Rules
+                            v
++----------------------------------------------------------+
+|                 COUCHE INFRASTRUCTURE                    |
+| +------------------------------------------------------+ |
+| | Database | External APIs | File System | Message Q  | |
+| | Prisma ORM | HTTP Clients | AWS SDK | Redis/Bull   | |
+| +------------------------------------------------------+ |
++----------------------------------------------------------+
+```
+
+4.2 IMPLÉMENTATION DES COUCHES
+-------------------------------
+
+COUCHE DOMAINE - ENTITÉS:
+```typescript
+// src/domain/entities/User.ts
+export class User {
+  private constructor(
+    private readonly id: UserId,
+    private email: Email,
+    private passwordHash: PasswordHash,
+    private profile: UserProfile,
+    private settings: UserSettings,
+    private readonly createdAt: Date,
+    private updatedAt: Date
+  ) {}
+
+  static create(props: CreateUserProps): Result<User> {
+    const emailOrError = Email.create(props.email);
+    if (emailOrError.isFailure) {
+      return Result.fail(emailOrError.error);
+    }
+
+    const passwordOrError = PasswordHash.create(props.password);
+    if (passwordOrError.isFailure) {
+      return Result.fail(passwordOrError.error);
+    }
+
+    const user = new User(
+      UserId.create(),
+      emailOrError.getValue(),
+      passwordOrError.getValue(),
+      UserProfile.create(props.profile),
+      UserSettings.default(),
+      new Date(),
+      new Date()
+    );
+
+    user.addDomainEvent(new UserCreatedEvent(user));
+    return Result.ok(user);
+  }
+
+  changeEmail(newEmail: string): Result<void> {
+    const emailOrError = Email.create(newEmail);
+    if (emailOrError.isFailure) {
+      return Result.fail(emailOrError.error);
+    }
+
+    this.email = emailOrError.getValue();
+    this.updatedAt = new Date();
+    this.addDomainEvent(new UserEmailChangedEvent(this));
+    
+    return Result.ok();
+  }
+
+  enableTwoFactorAuth(): Result<void> {
+    if (this.settings.isTwoFactorEnabled()) {
+      return Result.fail('2FA already enabled');
+    }
+
+    this.settings.enableTwoFactor();
+    this.updatedAt = new Date();
+    this.addDomainEvent(new TwoFactorEnabledEvent(this));
+    
+    return Result.ok();
+  }
+}
+```
+
+COUCHE DOMAINE - VALUE OBJECTS:
+```typescript
+// src/domain/valueObjects/Email.ts
+export class Email extends ValueObject<{ value: string }> {
+  private static readonly EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  get value(): string {
+    return this.props.value;
+  }
+
+  private constructor(props: { value: string }) {
+    super(props);
+  }
+
+  static create(email: string): Result<Email> {
+    if (!email || email.trim().length === 0) {
+      return Result.fail('Email cannot be empty');
+    }
+
+    if (!this.EMAIL_REGEX.test(email)) {
+      return Result.fail('Invalid email format');
+    }
+
+    return Result.ok(new Email({ value: email.toLowerCase() }));
+  }
+}
+
+// src/domain/valueObjects/PublicationContent.ts
+export class PublicationContent extends ValueObject<{
+  text: string;
+  media: Media[];
+  mentions: Mention[];
+  hashtags: Hashtag[];
+}> {
+  static create(props: ContentProps): Result<PublicationContent> {
+    const validation = this.validate(props);
+    if (validation.isFailure) {
+      return Result.fail(validation.error);
+    }
+
+    const processedContent = this.processContent(props.text);
+    
+    return Result.ok(new PublicationContent({
+      text: processedContent.text,
+      media: props.media || [],
+      mentions: processedContent.mentions,
+      hashtags: processedContent.hashtags
+    }));
+  }
+
+  private static validate(props: ContentProps): Result<void> {
+    if (!props.text || props.text.trim().length === 0) {
+      return Result.fail('Content cannot be empty');
+    }
+
+    if (props.text.length > 5000) {
+      return Result.fail('Content exceeds maximum length');
+    }
+
+    if (props.media && props.media.length > 10) {
+      return Result.fail('Too many media attachments');
+    }
+
+    return Result.ok();
+  }
+
+  adaptForPlatform(platform: Platform): AdaptedContent {
+    const adapter = PlatformAdapterFactory.create(platform);
+    return adapter.adapt(this);
+  }
+}
+```
+
+COUCHE APPLICATION - USE CASES:
+```typescript
+// src/application/useCases/CreatePublication.ts
+export class CreatePublicationUseCase implements UseCase<CreatePublicationDTO, PublicationDTO> {
+  constructor(
+    private userRepo: IUserRepository,
+    private draftRepo: IDraftRepository,
+    private mediaService: IMediaService,
+    private publisherService: IPublisherService,
+    private eventDispatcher: IEventDispatcher
+  ) {}
+
+  async execute(request: CreatePublicationDTO): Promise<Result<PublicationDTO>> {
+    try {
+      // 1. Récupération de l'utilisateur
+      const userOrError = await this.userRepo.findById(request.userId);
+      if (userOrError.isFailure) {
+        return Result.fail('User not found');
+      }
+      const user = userOrError.getValue();
+
+      // 2. Validation des permissions
+      if (!user.canPublish()) {
+        return Result.fail('User cannot publish');
+      }
+
+      // 3. Création du contenu
+      const contentOrError = PublicationContent.create({
+        text: request.content,
+        media: []
+      });
+      if (contentOrError.isFailure) {
+        return Result.fail(contentOrError.error);
+      }
+
+      // 4. Upload des médias si présents
+      let uploadedMedia: Media[] = [];
+      if (request.mediaFiles && request.mediaFiles.length > 0) {
+        const uploadResults = await this.mediaService.uploadMultiple(
+          request.mediaFiles,
+          user.getId()
+        );
+        if (uploadResults.isFailure) {
+          return Result.fail(uploadResults.error);
+        }
+        uploadedMedia = uploadResults.getValue();
+      }
+
+      // 5. Création du brouillon
+      const draftOrError = Draft.create({
+        userId: user.getId(),
+        content: contentOrError.getValue(),
+        media: uploadedMedia,
+        platforms: request.platforms,
+        scheduledAt: request.scheduledAt
+      });
+      if (draftOrError.isFailure) {
+        return Result.fail(draftOrError.error);
+      }
+      const draft = draftOrError.getValue();
+
+      // 6. Sauvegarde
+      await this.draftRepo.save(draft);
+
+      // 7. Publication ou planification
+      if (request.publishImmediately) {
+        const publishResult = await this.publisherService.publish(draft);
+        if (publishResult.isFailure) {
+          return Result.fail(publishResult.error);
+        }
+      }
+
+      // 8. Dispatch des événements
+      await this.eventDispatcher.dispatch(draft.getUncommittedEvents());
+
+      // 9. Retour du DTO
+      return Result.ok(PublicationMapper.toDTO(draft));
+      
+    } catch (error) {
+      return Result.fail(`Unexpected error: ${error.message}`);
+    }
+  }
+}
+```
+
+COUCHE INFRASTRUCTURE - REPOSITORIES:
+```typescript
+// src/infrastructure/repositories/PrismaUserRepository.ts
+export class PrismaUserRepository implements IUserRepository {
+  constructor(private prisma: PrismaClient) {}
+
+  async findById(id: UserId): Promise<Result<User>> {
+    try {
+      const userData = await this.prisma.user.findUnique({
+        where: { id: id.toString() },
+        include: {
+          socialConnections: true,
+          settings: true
+        }
+      });
+
+      if (!userData) {
+        return Result.fail('User not found');
+      }
+
+      const user = UserMapper.toDomain(userData);
+      return Result.ok(user);
+      
+    } catch (error) {
+      return Result.fail(`Database error: ${error.message}`);
+    }
+  }
+
+  async save(user: User): Promise<Result<void>> {
+    try {
+      const userData = UserMapper.toPersistence(user);
+      
+      await this.prisma.user.upsert({
+        where: { id: user.getId().toString() },
+        create: userData,
+        update: userData
+      });
+
+      return Result.ok();
+      
+    } catch (error) {
+      return Result.fail(`Failed to save user: ${error.message}`);
+    }
+  }
+
+  async findByEmail(email: Email): Promise<Result<User>> {
+    try {
+      const userData = await this.prisma.user.findUnique({
+        where: { email: email.value },
+        include: {
+          socialConnections: true,
+          settings: true
+        }
+      });
+
+      if (!userData) {
+        return Result.fail('User not found');
+      }
+
+      const user = UserMapper.toDomain(userData);
+      return Result.ok(user);
+      
+    } catch (error) {
+      return Result.fail(`Database error: ${error.message}`);
+    }
+  }
+}
+```

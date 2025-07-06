@@ -1,0 +1,1981 @@
+CONCEPTEUR
+DEVELOPPEUR
+D’APPLICATIONS
+2024-2025
+Tibet
+Restaurant
+BASARA MIGMAR -DOLMA
+1
+REMERCI EMENT
+Avant de vous faire part de mon expérience sur ce projet, je souhaite exprimer
+ma sincère gratitude à toutes les personnes qui ont rendu cette aventure possible
+et qui l’ont transformée en un véritable enrichissement.
+Je tiens à remercier chaleureusement M. Jensone, mon formateur, pour son
+soutien indéfectible. Sa disponibilité, son accompagnement constant et ses
+conseils avisés ont été essentiels à la réussite de ce projet.
+Je tiens a remercier envers M Raphael Hermegnies, Mme Valerie Casanova et
+Mme Annabel Dian pour leur esprit de professionnalism exemplaire. Leur
+communication ouverte, leur volonté de partager leurs connaissances et leur
+attitude positive ont créé un environnement de apprentisage agréable et
+productif. Collaborer dans cette formation a été un véritable plaisir. Leurs
+disponibilité et leur accompagnement tout au long de ma formation ont été
+d’une aide précieuse pour mener à bien mes missions. Leur patience,
+compétences et leur dévouement m’ont permis de progresser et de développer
+mes compétences dans des conditions optimales. Je tiens aussi à remercier mes
+camarades de classe, avec qui j’ai partagé une année enrichissante et conviviale.
+Leur soutien, et les moments partagés ont contribué à rendre cette expérience
+encore plus mémorable.
+J'adresse mes sincères remerciements à l’ensemble du corps administratif de
+Prepavenir Franconville pour la qualité de leur enseignement. Je souhaite que
+ce travail soit à la hauteur des attentes de mes formateurs.
+Enfin, je suis profondément reconnaissante envers toutes les personnes qui ont
+joué un rôle crucial dans la réalisation de ce projet. Leur soutien et leurs
+encouragements ont été essentiels pour rendre cette expérience enrichissante et
+formatrice.
+2
+SOMMAIRE
+Référentiel………………………...............................................................……P.5
+Résumé du Projet………………………............................................................P.6
+Cahier de Charge…......................................................................................... P.9
+I. Spécification fonctionnelle du projet ………............................................... P.12
+II. Gestion du Projet ..............................................................................…… P.15
+1. Diagramme de Gantt ........................................................................... P.20
+III. Conception UI & UX
+1. Personnas .............................................................................................P.21
+2. Zoning ................................................................................................. P.23
+3. Wireframe ............................................................................................P.25
+4. Charte Graphique ............................................................................... P.27
+5. Interface Utilisateur ........................................................................... P.29
+IV. Conception d’application
+1. Diagramme de cas d’utilisation ........................................................... P.32
+2. Diagramme de Séquence ..................................................................... P.33
+3. Diagramme de class .............................................................................P.34
+V. Conception de la base de donnée
+1. Dictionnaire de données.......................................................................P.37
+2. MCD ..................................................................................................P.37
+3. MLD ...................................................................................................P.40
+4. MPD ...................................................................................................P.41
+VI. Développement et Réalisation du projet
+1. Language de programation utilisé ..................................................... P.43
+2. Design MVC ..................................................................................... P.43
+3. Developpment de l’applicationTibet Restaurant ............................... P.43
+4. Implementation de l’application.. ...................................................... P.45
+VII. Politiique de Test
+1. Test Unitaire ......................................................................................P.62
+2. Test gestion des erreurs ......................................................................P.69
+3. Test Integration..................................................................................P.69
+4. Test functionnelle...............................................................................P.72
+3
+SOMMAIRE
+VIII. Securite .................................................................................................. P.74
+1.Restriction fontionnelles ....................................................................... P.75
+2. Cloisonnement des donées ................................................................... P.75
+3. Stockage local et risques de XSS........................................................... P.75
+4.Validation des entrées utilisateurs ......................................................... P.76
+5.Paiement sécurisé ...................................................................................P.76
+6.Schema de stockage cloisonné.................................................................P.76
+7.Protection generale .................................................................................P.77
+8.Cross Origin Resources Sharing .............................................................P.77
+9. Politique de mot de passe forte ..............................................................P.78
+10. Recaptcha V3 ........................................................................................P.79
+11. Protection contre CSRF ........................................................................P.80
+12. Redirection HTTPS................................................................................P.83
+IX. Deploiement
+1. Docker ................................................................................................. P.84
+2. Hostinger ..............................................................................................P.85
+X. Mise en production .................................................................................... P.88
+XI. Veille de securité OWASP......................................................................... P.89
+Conclusion ..................................................................................................... P.91
+Annexe ........................................................................................................... P.92
+Acronymes ..................................................................................................... P.94
+4
+RE F ERENTI E L
+5
+RES UME DU PROJET
+Introduction
+Je vise à développer un système de gestion de caisse pour un restaurant en
+utilisant le framework Symfony. Le diagramme de classes fourni décrit la
+structure de base du modèle de données et les fonctionnalités principales. Ce
+rapport mettra en lumière les principales fonctionnalités à implémenter ainsi
+que les concepts architecturaux à intégrer dans le cadre du projet.
+Technologie Utilisée : Symfony
+Symfony est un framework PHP robuste et populaire, idéal pour construire des
+applications web complexes comme un système de gestion de caisse de
+restauration. Avec Symfony, nous pouvons utiliser un ensemble de composants
+réutilisables, un ORM pour la gestion de la base de données via Doctrine, ainsi
+que des outils pour la gestion des formulaires, de la sécurité et des API.
+Fonctionnalités Principales à Implémenter
+1.Gestion des Clients
+Le système permettra aux clients de passer des commandes, de modifier ou
+d'annuler celles-ci. Les classes à implémenter incluront :
+Création d'un Customer (client), avec des informations comme le nom,
+l'email, le mot de passe, l’adresse, etc.
+Méthodes :
+placeOrder(): permettre au client de passer une commande.
+modifyOrder(): modification de la commande existante par le
+client.
+cancelOrder(): annulation de la commande par le client.
+2. Gestion des Commandes
+La gestion des commandes impliquera la création de nouvelles commandes, leur
+modification, suivi de leur statut ainsi que demandes spéciales du client..
+La classe Order représentera une commande, avec des attributs comme
+la date de commande, le montant total, le statut de paiement et de
+commande.
+Méthodes :
+searchOrder(): rechercher une commande spécifique.
+checkOrderStatus(): vérifier le statut actuel d'une commande.
+6
+RES UME DU PROJET
+3. Gestion des Éléments de Menu
+Les éléments de menu représentent les plats disponibles à la commande. Ils seront
+gérés par l'administrateur ou le personnel du restaurant.
+La classe Menu Item définira les attributs de chaque plat, tels que le nom, la
+description, le prix, la catégorie (entrée, plat, dessert), et la disponibilité.
+Méthodes :
+searchMenuItem(): recherche des éléments de menu spécifiques.
+4. Gestion des Paiements
+Le système de paiement permettra aux clients de finaliser leurs commandes
+avec une carte de crédit.
+La classe Payment contiendra des informations relatives aux paiements
+comme le montant, la date de paiement, la méthode de paiement.
+Méthodes :
+processPayment(): traitement des paiements pour les commandes.
+checkStatus(): vérification du statut du paiement.
+5. Gestion des Utilisateurs
+Les utilisateur de l’application (serveurs, administrateurs) auront accès à des
+fonctionnalités supplémentaires comme la gestion des commandes et des
+paiements en plus de l’encaissement sur place avec la même outils.
+La classe User inclut des attributs comme l'email, le mot de passe, et le rôle
+(serveur, manager, etc.) qui différentié de leur client.
+Méthodes :
+checkOrder(), modifyOrder(), cancelOrder(): gestion complète des
+commandes par les employés.
+modifyMenuItem(): modification des éléments du menu.
+cashPayment(): encaissement des paiements en espèces.
+trPayment(): encaissement des paiements en Ticket Restaurant.
+6. Gestion des Articles Commandés
+La classe Order Item relie les commandes individuelles aux éléments de
+menu. Chaque commande peut contenir plusieurs articles.
+Attributs : quantité, itemPrix.
+Méthodes : addOrderItem() pour ajouter un élément à une commande.
+7
+RES UME DU PROJET
+7. Structure des Relations
+Le diagramme de classes fourni montre les relations entre les différentes entités du
+système :
+User est en relation de "1 à plusieurs" avec Order (un client peut passer
+plusieurs commandes).
+Order est en relation de "1 à plusieurs" avec OrderItem (une commande
+contient plusieurs articles).
+OrderItem est en relation de « plusieurs a 1 » avec MenuItem (chaque
+article commandé correspond à un élément du menuItem).
+Payment est lié à une Order et gère les informations de paiement.
+Architecture Symfony
+L’implémentation de ce projet se fera en respectant le modèle MVC (Modèle-VueContrôleur) :
+Modèle (Model) : gestion des entités avec Doctrine ORM, qui nous permet de
+gérer les relations entre les entités User, Order, Payment, etc.
+Vue (View) : utilisation de Twig pour le rendu des interfaces utilisateur comme
+les pages de menu, de commande, et de paiement.
+Contrôleur (Controller) : gestion des actions telles que la création de
+commande, le traitement des paiements, la modification des éléments de menu.
+Sécurité et Authentification
+L’authentification des utilisateurs (clients et employés) sera gérée via Symfony
+Security. Le système implémentera des rôles distincts pour les clients et les
+employés afin de limiter l'accès aux fonctionnalités selon leur rôle. Et un accès
+admin pour pouvoir gérer les rôles des employés et leur droit.
+Conclusion
+Ce système de gestion de caisse pour la restauration couvrira les besoins
+fondamentaux de gestion des commandes, des paiements, des clients, des articles de
+menu et des employés. Symfony fournira la robustesse et la modularité nécessaires
+pour assurer un développement évolutif et sécurisé du système.
+8
+CAHI ER DE CHARGES
+1. Contexte et Objectifs
+Ce projet consiste à développer une application web inspirée d’Uber Eats, mais
+limitée à un seul restaurant. L’application permet aux clients de passer des
+commandes en ligne et de choisir entre la livraison et le retrait en magasin.
+L’application dispose également de rôles pour les employés et les administrateurs,
+qui peuvent utiliser une interface pour gérer les commandes et encaisser les clients
+directement au restaurant.
+L’objectif principal est de proposer une solution intuitive, réactive et
+performante, en utilisant Symfony 7.2 et PHP 8.3 comme technologies
+principales.
+2. Périmètre Fonctionnel
+2.1. Fonctionnalités Principales
+Client (Front-end)
+Création de compte et connexion.
+Consultation du menu (plats, descriptions, prix, images).
+Ajout de produits au panier.
+Choix entre livraison et retrait en magasin.
+Paiement en ligne (intégration d’un système de paiement sécurisé via
+STRIPE).
+Suivi de commande en temps réel.
+Employé (Back-office)
+Accès au tableau de bord des commandes.
+Mise à jour du statut des commandes (en préparation, prête, livrée).
+Encaissement des clients sur place (interface de point de vente) avec des
+diffèrents modes de paiement intégré.
+Editer les menu Items.
+Administrateur (Back-office)
+Gestion des utilisateurs (création, modification, suppression des Users).
+Gestion du menu Item (ajout, modification, suppression de plats).
+Encaissement des clients sur place (interface de point de vente).
+Suivi des performances (rapports de Chiffre d’affaires).
+9
+CAHI ER DE CHARGES
+2.2. Contraintes Techniques
+Développement en Symfony 7.2.
+Langage backend : PHP 8.3.
+Base de données : MySQL.
+Respect des normes de sécurité (protection des données, gestion des sessions).
+Design adaptatif (responsive) pour une utilisation sur mobile, desktop et des
+tablet.
+3. Architecture et Technologies
+3.1. Architecture Applicative
+Modèle MVC (Modèle-Vue-Contrôleur).
+Utilisation des entités Doctrine pour la gestion des données.
+Séparation claire entre front-end et back-end.
+3.2. Technologies Utilisées
+Framework Backend : Symfony 7.2
+Langage : PHP 8.3
+Base de données : MySQL
+Front-end : HTML5, tailwindCSS, JavaScript
+Framework : Symfony
+4. Rôles et Responsabilités
+4.1. Rôle Client
+Accès à l’application pour passer des commandes.
+Annulation des commandes.
+Accès à son profil pour consulter et modifier ses informations, y compris la
+mise à jour du mot de passe, tout en respectant les critères de validation du
+nouveau mot de passe. Le mot de passe sera ensuite chiffré à l'aide de
+l'algorithme par défaut bcrypt de Symfony .
+Accès à l’historique de toutes les commandes passées.
+Consultation du statut des commandes.
+10
+CAHI ER DE CHARGES
+4.2. Rôle Employé
+Utilisation d’une interface pour l’encaissement(par CB, Ticket Restaurant et
+en espèces)
+Editer les menu Item déjà enregistré.
+Accès à son profil pour voir et éditer en plus de la modification de mot de
+passe en respectent le critère du nouveau mot de passe.
+Accès a la dernière commande pour la suivi et aussi l’outil met a disposition
+pour les employées de voir toutes les commandes et aussi d'éditer le statut des
+commandes.
+4.3. Rôle Administrateur
+Gestion globale d’application.
+Gestion des users et des menus.
+Utilisation d’une interface pour l’encaissement (par CB, Ticket Restaurant et
+en espace)
+Editer et ajouter les menu Item.
+Accès à son profil pour voir et éditer en plus de la modification de mot de
+passe en respectent le critère du nouveau mot de passe.
+Accès à la dernière commande pour le suivi et aussi l’outil met à disposition
+pour l’admin de voir toutes les commandes et aussi d'éditer le statut des
+commandes.
+Accès aux statistiques et rapports.
+5. Livrables
+Application fonctionnelle et testée.
+Documentation technique.
+Guide d’utilisation pour les employés et administrateurs.
+Code source versionné (Git).
+6. Critères de Succès
+Interface utilisateur intuitive et ergonomique.
+Temps de réponse rapide pour toutes les actions.
+Gestion fluide des commandes.
+Application conforme aux normes de sécurité. 11
+1. SPECI F ICATION FONCTIONNE L L E DU PROJET
+1. Objectifs Fonctionnels
+L'objectif principal est de développer une application web qui permet :
+Aux clients de passer des commandes en ligne, de suivre leur état, et de payer
+via une plateforme sécurisée.
+Aux employés du restaurant de gérer les commandes et d'encaisser les
+paiements directement au restaurant en différents moyens de paiement comme
+carte bancaire, Ticket Restaurant et en espèces.
+Aux administrateurs de gérer les menus, les utilisateurs et de consulter des
+rapports de performances.
+2. Utilisateur Principaux
+Client
+Créer un compte et se connecter.
+Parcourir le menu et ajouter des articles au panier.
+Choisir un mode de réception (livraison ou retrait en magasin).
+Suivre le statut de la commande.
+Payer en ligne.
+Employé
+Accéder à un tableau de bord des commandes.
+Mettre à jour le statut des commandes (en cours, prêtes, livrées).
+Gérer les encaissements des clients sur place.
+Administrateur
+Gérer les utilisateurs (clients et employés).
+Modifier le menu (ajout/suppression/édition de plats).
+Gestion des commandes.
+Consulter des statistiques et rapports de ventes.
+3. Modèle de Données
+Les entités principales pour ce projet sont :
+Utilisateur : représente les clients, employés, et administrateurs, définit les
+privilèges des utilisateurs..
+12
+1. SPECI F ICATION FONCTIONNE L L E DU PROJET
+Order : contient les détails de la commande effectuée par un client
+directement via plateforme ou encaissé par employés ou admin sur place.
+Représente la totalité de la commande.
+Menu Item: représente un plat du menu.
+Order Item: représente la quantité de ce menu item lie a une commande
+passe.
+Paiement : représente les détails de la transaction effectuée.
+4. Diagramme de Classes
+Pour la représentation visuelle du modèle conceptuel, un diagramme de classes a
+été conçu à l'aide de draw.io.
+Description des Classes
+Utilisateur :
+Attributs : id, nom, email, firstName,lastName,phone,address,
+motDePasse, role, isVerified.
+Méthodes : register(), login().
+Order :
+Attributs : id, orderDate, orderStatut, totalAmount,userId,
+paymentStatus,idDelivery, specialRequest.
+Méthodes : createOrder(), updateOrder().
+OrderItem:
+Attributs: id,quantiy, itemPrice, orderId, menuItemId
+Methodes: addOrderItem().
+MenuItem :
+Attributs : id, name, description, price,category,isAvailable,img.
+Méthodes : addMenuItem(), updateMenuItem().
+Paiement :
+Attributs : id, amount, paymentDate, orderId, paymentMethod,
+createdAt, updatedAt.
+Méthodes : pay().
+13
+1. SPECI F ICATION FONCTIONNE L L E DU PROJET
+Les Relations:
+Le diagramme comprend les entités décrites ci-dessus avec leurs relations :
+User a une relation de 1..* avec Order (un utilisateur peut avoir plusieurs
+commandes).
+Order est liée à Order Item via une relation de 1..* (une commande contient
+plusieurs Order Item).
+Order ( commande) est liée à Paiement via une relation 1..1.
+Un order Item est liée a menu item via une relation 1 .. * .
+5. Outils et Méthodes
+Technologies Utilisées :
+Backend : Symfony 7.2 et PHP 8.3.
+Base de données : MySQL.
+Frontend : HTML, CSS, JavaScript.
+Outil pour le Diagramme : draw.io.
+Structure MVC : Utilisation du Modèle-Vue-Contrôleur pour une séparation
+claire des responsabilités.
+14
+II. GESTION DU PROJET
+1 Organisation du Projet
+La gestion du projet représente l’apogée de notre initiative. Comme pour tout
+commencement d’un projet, l’ascension des premières étapes a été une tâche
+ardue, nécessitant une décision cruciale sur la méthodologie de travail à adopter.
+L’organisation du projet est clairement definie pour assurer son bon déroulement
+et sa réalisation réussie. L’élaboration de la composante backend, ainsi que tous
+les aspects de la conception backend, constitue une section intégrale de mon
+travail . Impliquer la mise en place de structures de données, la gestion des
+requêtes et des réponses, et l’assurance de la connectivité avec les autres
+composantes du système. Cela a nécessité une coordination étroite et une
+compréhension des objectifs pour garantir une intégration fluide et efficace.
+2.Méthodologie de gestion du projet
+Pour ce projet, la méthodologie de gestion adoptée est la méthode Kanban. Cette
+dernière est une méthode de gestion comme la méthode scrum. La méthode
+scrum s’appuie sur des cycles de développement régulier, en général en sprint de
+deux semaines, tandis que la méthode kanban quant à elle fait évoluer un projet
+chaque jour avec une démarche d’amélioration continue. Elle s’appuie sur une
+approche simple qui représente visuellement un flux de travail sous forme de
+tableau. Cette démarche permet de gérer les priorités et de connaître le statut
+d’avancement de chaque tâche que l’on peut aisément prioriser. Dans ce sens, il
+est basé sur l’idée de fournir continuellement des petits lots de travail. Kanban
+travaille sur la notion de pull system, c’est-à-dire que les éléments sont tirés du
+back log selon la capacité. Il se démarque entre autres sur la limitation du travail
+en cours et l’amélioration continue. L’un des points phares est de permettre
+d’identifier et de résoudre rapidement les goulots d’étranglement dans le flux
+de travail et d’améliorer le time to market. Pour mon projet Tibet Restaurant j’ai
+utilisé la méthode kanban sur Trello. En effet, Dans un premier temps, Jai
+configuré les différents lots de taches a effectuer en un seul dépôt. Dans un
+deuxième temps, Jai créé des labels, pour représenter chaque étape du projet,
+avec de statut comme :Inspiration, a faire, en cours, bloqué, terminé et en Test
+avec des diffèrent niveau d’importance et la durée.
+15
+II. GESTION DU PROJET
+Structure du Tableau Trello :
+·Listes :
+1. Idées : Pour collecter des fonctionnalités ou idées futures.
+2. À faire : Liste des tâches prévues.
+3. En cours : Tâches actuellement travaillées.
+4. Bloqué : Tâches qui nécessitent une clarification ou des ressources
+supplémentaires.
+5. Terminé : Tâches finalisées.
+Cartes Exemple :
+·Phase de Conception
+"Écrire le cahier des charges" (fait).
+"Planifier le diagramme de Gantt".
+·Phase de Développement
+"Configurer Symfony avec PHP 8.3".
+"Créer le système de gestion utilisateur".
+·Phase de Tests et Validation
+"Réaliser des tests unitaires pour le système d’authentification".
+"Tester l’interface utilisateur sur mobile".
+Il m’a permis de visualiser et de gérer les tâches de manière efficace, tout en
+identifiant et en résolvant les obstacles qui entravent le flux du progrès.
+Lien Trello 16
+II. GESTION DU PROJET
+3.Versioning du code
+• Définition
+Le gestionnaire de versions est un programme ou logiciel qui a pour but de
+conserver un historique des modifications de versions de tous les fichiers sur
+plusieurs branches. Il garde en mémoire les modifications, les raisons ainsi que
+le nom de l’auteur de ce changement. Une personne travaillant seule garde
+ainsi l’historique des modifications de son projet (dépôt). Même en travaillant
+seule, le gestionnaire fusionne les modifications des différentes versions sur un
+même projet.
+• GIT
+Git est un logiciel de gestion de versions décentralisé libre et gratuit. Il a été créé
+en 2005 par l’auteur du noyau Linux : Linus Torwalds. Dès le début des années
+2010, Git est le logiciel de contrôle de version le plus populaire et le plus utilisé
+dans le monde. Git ne repose pas sur un serveur centralisé, mais il utilise un
+système de connexion Peer to Peer. Le code source développé est stocké non
+seulement en local et sur l’ordinateur de chaque contributeur du projet, mais il
+peut également l’être sur un serveur dédié. C’est un outil qui se veut simple et
+dont la tâche principale est de gérer l’évolution du contenu d’une arborescence
+d’un projet.
+La décentralisation de Git a beaucoup apporté au développement des logiciels
+libres, puisque le besoin de demander un compte sur un dépôt centralisé devient
+obsolète. Il suffit ainsi de cloner un projet pour commencer à travailler dessus.
+L’historique du projet suit naturellement. Chacun peut ainsi proposer sa
+contribution au dépôt principal.
+Dans le cadre de mon projet Tibet Restaurantjai utilisé Github comme outil de
+gestion du code. GitHub est une Plateforme de Gestion de Code et
+Collaboration. GitHub est une plateforme de gestion de code source et de
+collaboration basée sur le contrôle de version Git. Elle est largement utilisée par
+les développeurs et les équipes pour gérer efficacement leurs projets logiciels.
+17
+II. GESTION DU PROJET
+Voici un aperçu de ses principales fonctionnalités et avantages :
+1. Contrôle de Version
+GitHub repose sur Git, un outil de contrôle de version distribué qui permet de :
+Suivre les modifications apportées au code source.
+Revenir à une version précédente en cas d’erreur.
+Travailler sur plusieurs branches simultanément pour développer de nouvelles
+fonctionnalités ou corriger des bugs.
+2. Collaboration
+GitHub facilite la collaboration au sein d’une équipe grâce à des fonctionnalités
+comme :
+Pull Requests (PR) : Permet de proposer des modifications de code, de les
+examiner et de les intégrer dans le projet principal après validation.
+Commentaires : Les membres de l'équipe peuvent commenter le code,
+discuter des changements et fournir des retours.
+Issues : Un système de suivi des tâches pour signaler et gérer les bugs, les
+améliorations ou les idées de fonctionnalités.
+3. Hébergement de Projets
+GitHub offre un hébergement gratuit pour les projets open source ainsi que des
+options payantes pour les projets privés. Je peux :
+Héberger le projet Tibet Restaurant en ligne.
+Partager le code avec d’autres développeurs ou collaborateurs.
+4. Intégration et Automatisation
+GitHub propose des outils pour automatiser les workflows :
+GitHub Actions : Permet de configurer des pipelines d’intégration continue
+(CI) et de déploiement continu (CD).
+Automatisation des tests pour vérifier que le code est stable.
+18
+II. GESTION DU PROJET
+5. Documentation
+Avec GitHub, il est facile de créer une documentation pour ton projet :
+Utilise le fichier README.md pour décrire mon projet Tibet Restaurant,
+son objectif, comment l’installer et l’utiliser.
+Héberge une documentation détaillée avec des fichiers Markdown ou des
+wikis.
+6. Communauté et Open Source
+GitHub est au cœur de la communauté open source :
+Il permet de collaborer avec des développeurs du monde entier.
+De nombreux outils et bibliothèques sont disponibles en tant que projets
+open source sur GitHub.
+7. Sécurité et Permissions
+GitHub propose des fonctionnalités pour protéger ton projet :
+Gestion des autorisations pour contrôler qui peut lire ou modifier le code.
+Analyse des vulnérabilités dans le code grâce à Dependabot.
+19
+1. DIAGRAMME DE GANTT
+Voici une explication du diagramme de Gantt présenté :
+Analyse des besoins : Cette tâche, en bleu, constitue la première étape, où les
+exigences fonctionnelles et techniques du projet sont identifiées (du 21 au 22
+octobre 2024).
+1.
+Diagramme : Représentée en orange, cette étape vise à concevoir le diagramme
+initial, probablement un MCD ou une base visuelle pour la base de données (du
+23 au 24 octobre 2024).
+2.
+MCD/MLD/MPD : En vert, cette tâche implique la conception complète des
+modèles conceptuels, logiques et physiques (du 25 au 28 octobre 2024).
+3.
+Développement : La phase de développement commence ici, marquée en rose, où
+les bases sont posées pour le projet (du 29 au 31 octobre 2024).
+4.
+Schéma de la base de données : En jaune, cette étape vise à créer et structurer le
+schéma de la base de données (du 1er au 7 novembre 2024).
+5.
+Mettre en place des fixtures : En cyan, cette étape consiste à ajouter des données
+de test ou initiales dans la base (du 8 au 15 novembre 2024).
+6.
+Test : En magenta, la phase de test permet de valider le fonctionnement de la base
+et des relations définies (du 18 au 25 novembre 2024).
+7.
+Déploiement : En vert clair, cette dernière étape couvre la mise en production de
+la base de données et les ajustements finaux (du 26 novembre au 18 décembre
+2024).
+8.
+20
+1. Le Professionnel Occupé
+Nom : Emily Harper
+Âge : 32 ans
+Profession : Responsable Marketing
+Niveau de maîtrise technologique : Élevé
+Objectifs :
+Commander rapidement des repas pendant les journées chargées ou les soirées
+tardives au bureau.
+Accéder à une grande variété de cuisines pour satisfaire différents goûts.
+Programmer des commandes à l’avance pour les adapter à ses réunions.
+Points sensibles:
+Retards de livraison aux heures de pointe.
+Manque d'options saines pour une livraison rapide.
+Comportements :
+Commande fréquemment le déjeuner en semaine.
+Utilise des fonctionnalités comme la commande rapide ou le suivi des livraisons.
+Privilégie les applications avec des programmes de fidélité et des réductions.
+III. CONCEPTION U I & UX
+La conception UX/UI est un élément crucial de tout projet informatique pour
+diverses raisons.
+L’UX : définit la facilité d’utilisation et de compréhension d’une interface.
+L’UI : décrit l’apparence et l’esthétisme d’une interface.
+Pour assurer le succès d’un projet global, il est impératif de suivre une série
+d’étapes :
+• Comprendre nos utilisateurs : la première étape consiste à étudier nos clients, à
+comprendre leurs besoins et à déterminer à qui notre site s’adresse. Cela implique
+une recherche approfondie sur les utilisateurs, y compris des entretiens, des
+enquêtes et l’analyse des données d’utilisation. Cette etape j’ai realisé avec les
+diffèrent Personnas.
+21
+2. L’Étudiant Universitaire
+Nom : Jordan Lewis
+Âge : 21 ans
+Profession : Étudiant
+Niveau de maîtrise technologique : Moyen-Élevé
+Objectifs :
+Commander des repas abordables qui respectent un budget serré.
+Diviser les paiements facilement lors des commandes entre amis.
+Trouver des options tardives pour les sessions d’étude nocturnes.
+Points sensibles :
+Frais de livraison élevés et exigences de commande minimale.
+Manque d'options végétariennes ou véganes autour du campus.
+Comportements :
+Recherche souvent des promotions et des réductions.
+Commande principalement le soir ou le week-end.
+Partage les commandes avec des amis grâce à des fonctionnalités de commande
+groupée.
+III. CONCEPTION U I & UX
+22
+3.La mère du Foyer
+Nom : Sarah Thompson
+Âge : 40 ans
+Profession : Parent au foyer
+Niveau de maîtrise technologique : Moyen
+Objectifs :
+Trouver des repas adaptés aux enfants pour toute la famille.
+Identifier des menus familiaux ou des offres groupées pour économiser.
+Suivre les temps de livraison pour organiser les repas familiaux.
+Points sensibles:
+Qualité incohérente ou articles manquants dans les grosses commandes.
+Difficulté à coordonner des repas pour des mangeurs difficiles.
+Comportements :
+Commande des repas familiaux ou en grande quantité pour le dîner.
+Consulte souvent les avis des utilisateurs pour garantir la qualité.
+Programme occasionnellement des commandes pour des événements spéciaux.
+III. CONCEPTION U I & UX
+23
+III. CONCEPTION U I & UX
+•Création du zoning : la deuxième étape est la création du zoning, qui est
+une phase préliminaire du processus de design où l’on définit les grandes zones ou
+blocs qui composent la structure de la page ou de l’interface. Cela donne une vue
+d’ensemble de la disposition de l’interface et aide à organiser l’information de
+manière logique.
+• Création des wireframes : ensuite, j’ai crée des wireframes complets pour
+avoir une idée précise de ce à quoi mon site va ressembler. Cette étape concerne
+l’expérience utilisateur (UX), c’est-à-dire comment l’utilisateur interagit avec mon
+design, ce qu’il doit faire, où il doit cliquer.
+• Développement de l’identité graphique : la prochaine étape est le
+développement de l’identité graphique, cela comprend la génération d’une palette
+de couleurs, la création de la thème graphique, le choix des polices d’écritures. Jai
+utilisé ensuite cette identité graphique pour créer l’interface utilisateur (UI).
+• Création de l’interface utilisateur (UI) : enfin, j’ai transformé mon wireframe
+complet en une version améliorée, c’est-à-dire que on ajoutons des couleurs, des
+polices d’écriture, des boutons, des icônes, de images. Cela donne un design
+complet et attrayant.
+Maintenant, je vais procéder à une explication approfondie de chacune de ces
+étapes. Pour faciliter la compréhension, j’illustrerai nos différents écrans à l’aide
+de captures d’écran, allant du zoning jusqu’au prototype finale. Cela permettra de
+visualiser concrètement le processus et les résultats à chaque étape.
+1. Zoning
+Le zoning est une étape de travail qui consiste à définir les grandes zones d’une
+interface ou d’une page web. Il s’agit de l’organisation spatiale des différents
+éléments qui composeront le site, comme les images, les boutons d’action, ou
+encore les blocs de navigation. Il est essentiel pour structurer les informations de
+manière logique et intuitive pour l’utilisateur, favorisant ainsi une meilleure
+expérience utilisateur.
+Dans ce sens, le zoning est une technique de conception qui a un impact direct sur
+l’expérience utilisateur. Il donne à voir les grandes zones de l’interface et clarifie
+l’occupation de l’espace dans l’interface utilisateur. Je vous présente quelques
+captures d’écran illustrant le zoning pour les versions web et desktop de mon
+projet Tibet Restaurant.
+24
+III. CONCEPTION U I & UX
+25
+III. CONCEPTION U I & UX
+2. Wireframe
+Un wireframe, est un outil de conception qui offre une vue d’ensemble de
+l’interface à créer. Il s’agit d’un schéma simplifié qui illustre l’agencement et
+l’organisation des éléments sur une page sans se concentrer sur les détails
+esthétiques tels que les couleurs, les polices spécifiques ou les dimensions précises.
+L’objectif principal d’un wireframe est de définir la structure, la hiérarchie de
+l’information et la fonctionnalité de l’interface.
+Pour la conception de l’interface web de notre projet, j’ai utilisé outil Figma. Cet
+outil a permis de créer des représentations visuelles de l’interface de notre
+application web, en assurant un équilibre entre l’interface utilisateur (UI) et
+l’expérience utilisateur (UX). Grâce à Figma, Jai pu accélérer le processus de
+conception en visualisant rapidement les différents dispositions et interactions
+possibles. Cela a permis de faciliter la prise de décisions de conception plus
+éclairées. Voici quelques captures des wireframes des différents écrans réalisées
+sous Figma.
+WireFrame de La Login Page(Web)
+26
+III. CONCEPTION U I & UX
+WireFrame de Home Page Web, tablet et Iphone
+Lien complet de Wireframe
+27
+III. CONCEPTION U I & UX
+3. Identité graphique : charte graphique
+Par définition la charte graphique est un document essentiel qui définit et décrit
+l’ensemble des éléments visuels utilisés pour représenter, une marque ou un
+projet. Elle établit les règles et les normes graphiques à suivre afin d’assurer une
+cohérence visuelle sur tous les supports de communication, tels que les sites web,
+les brochures, les affiches.
+La charte graphique inclut généralement des éléments tels que les couleurs
+principales et secondaires, les typographies, les logos, les icônes, ainsi que les
+règles de mise en page. Voici la charte graphique pour mon projet Tibet
+Restaurant réalisé sous Figma.
+28
+III. CONCEPTION U I & UX
+4. Interface Utilisateur (IU) : Figma
+L’interface utilisateur est la partie visible du produit, son apparence, sa mise en
+page, son interactivité. L’UX est centrée sur l’humain, tandis que l’UI s’intéresse
+à l’expérience globale de l’utilisateur, il se concentre sur l’interface. Il donne vie
+au produit en mixant des éléments graphiques et des éléments fonctionnels, de
+telle sorte que le produit soit le plus attractif, agréable et accessible possible. Voici
+quelques captures de notre interface utilisateur :
+Home Page
+29
+III. CONCEPTION U I & UX
+30
+IV. CONCEPTION D’APPL ICATION : LANGAGE UML
+• Définition
+Le Langage de Modélisation Unifié (Unified Modeling Language) est un
+langage de modélisation graphique standardisé qui repose sur une approche
+orienté objet. Il a été conçu pour être un langage de modélisation visuelle
+commun, riche sémantiquement et syntaxiquement. UML est destiné à
+l’architecture, la conception et la mise en œuvre de système logiciels complexes,
+tant par leur structure que par leur comportement. Il assure entre autres la
+communication entre les différentes parties prenantes du projet, y compris les
+développeurs, les chefs de projet, et les. Utilisateurs.
+UML se compose de différents types de diagrammes qui décrivent la limite, la
+structure et le comportement du système et des objets qui s’y trouvent. Bien
+qu’UML ne soit pas un langage de programmation, il existe des outils qui permet
+de générer du code dans plusieurs langages à partir de diagrammes UML.
+Les diagrammes UML peuvent non seulement être utilisés pour modéliser
+différents aspects d’un système logiciel, mais aussi ils aident à planifier et à
+concevoir la structure et le comportement des systèmes logiciels avant leur mise
+en œuvre.
+Il sert également de documentation pour le système logiciel, il fournit une
+représentation visuelle du système qui peut être facilement comprises par les
+nouvelles parties prenantes ou les membres de l’équipe.
+C’est un outil essentiel pour les développeurs de logiciels ainsi que les autres
+acteurs impliqués dans le développement logiciels.
+Pour réaliser cette partie, nous avons utilisé des outils de modélisation
+spécifiques, Draw.io. Ces outils nous ont permis de concevoir plusieurs
+types de diagrammes, parmi ceux-ci, le diagramme de cas d’utilisation, qui
+illustre les interactions entre les acteurs externes et les services du système. Le
+diagramme de séquences, qui décrit la séquence d’interactions entre les objets et
+les classes sur la durée d’un scénario spécifique. Et enfin, le diagramme de classes,
+qui représente les classes du système, leurs attributs, leurs méthodes et les
+relations entre elles.
+Ces différents diagrammes ont été essentiels pour visualiser et comprendre les
+différents composants de notre système, ainsi que leurs interactions.
+31
+IV. CONCEPTION D’APPL ICATION : LANGAGE UML
+Dans un premier temps, j’aborderai le diagramme de cas d’utilisation, puis
+de séquences, et enfin je conclurai avec une analyse détaillée du diagramme de
+classe.
+1. Diagramme de cas d’utilisation
+Les rôles des diagrammes de cas d’utilisation sont de recueillir, d’analyser et
+d’organiser les besoins et les exigences d’un système. Ils permettent d’identifier
+les principales fonctionnalités qui seront intégrées dans le système. En tant que
+première étape de la conception UML d’un système, ils constituent un outil
+indispensable pour comprendre et définir les besoins du système.
+Un diagramme de cas d’utilisation est composé de trois éléments principaux :
+• Un Acteur : c’est l’idéalisation d’un rôle joué par une entité externe (qui peut
+être une personne, un processus ou un objet) qui interagit avec un système. Il se
+représente par un petit bonhomme avec son nom inscrit dessous.
+• Un cas d’utilisation : c’est une unité cohérente représentant une fonctionnalité
+visible de l’extérieur. Il réalise un service de bout en bout, avec un
+déclenchement, un déroulement et une fin, pour l’acteur qui l’initie.
+• Les relations : trois types de relations sont pris en charge par la norme UML et
+sont graphiquement représentées par des types particuliers de ces relations. Les
+relations indiquent que le cas d’utilisation source présente les mêmes conditions
+d’exécution que le cas issu. Une relation simple entre un acteur et une utilisation
+est un trait simple.
+Il a y aussi le cas d’un visiteur, c’est une personne qui est entrain de parcourir,
+fouiller le net en cherchant un menu intéressent pour l’acheter ou pour avoir une
+idée sur les menus et les prix. Jusqu’à ce stade c’est un utilisateur inconnu donc il
+n’est pas encore un client.
+Je vous présente le diagramme de cas d’utilisation de application web pour
+pouvoir passer une commande , par la suite je vous fournirai une interprétation
+détaillée de ce diagramme.
+32
+1.DIAGRAMME DE CAS D’ U TI L ISATION
+33
+IV. CONCEPTION D’APPL ICATION : LANGAGE UML
+Client : dans le cadre de mon projet Tibet Restaurant, a la possibilité de fuieller
+dans le site pour pouvoir voir la proposition de restaurant. Et aussi de mettre le
+menu dans le panier ou mettre le mettre comme un favoris, mais pour avancer a la
+paiement il doit obligatoirement connecté a son identifiant ou faire une inscription
+aupres de l’application.
+De ce fait, une fois que le client est authentifié sur notre site, il pourra consulter les
+menus, ajouter un menu dans le favori, il pourra également ajouter un menu dans le
+panier, commander et procéder au paiement et même modifier ces informations. Il
+peut donc suivre le processus de la commande de repas en toute sécurité sachant
+que notre système doit être l’unique responsable de la confidentialité des données
+personnelles de ses clients.
+Les acteurs internes : dans mon application j’ai plusieurs acteurs interne
+Employée et les Admins. La différence se situera seulement dans la possibilité de la
+gestion des droits. Les Employées sont capable de toute faire sauf de pouvoir
+ajouter une nouvelle menu Item and de suprimer. Ainsi que l’ajoute, modification
+et supprimer les differents utilisateurs de l’appli. Dans chacune des actions la
+connexion est nécessaire. Sauf pour consultation des menu et ajouter dans la
+favoris et dans la panier.
+2. Diagramme de séquences
+Un diagramme de séquences est une représentation graphique qui illustre en détail
+comment les opérations sont réalisées dans un système. Les diagrammes de
+séquence montrent comment les objets interagissent en termes de messages
+échangés dans un ordre temporel spécifique.
+Dans la suite je vous présenterai un cas d’illustration d’un diagramme de séquence
+qui est directement liée un cas d’utilisation que je vous ai précédemment présenté.
+voici le scenario qui se passe lors de la connexion d’un client sur notre application
+Le client :
+• Client saisit son login et son mot de passe.
+• Une vérification se lance dans la base de données.
+• Après un temps de réponse on aura ces deux conditions :
+• L’authentification est réussie, le client peut accéder à l’interface de mon site.
+• L’authentification échoue, le client est invité à ressaisir à nouveau ses
+identifiants avec un message d’erreur.
+34
+2.DIAGRAMME DE SEQU ENCE
+3. Diagramme de classe
+Le diagramme de classe est un élément central de la conception d’un système, il
+offre une représentation statique du système en cours de développement.
+Chaque classe dans ce diagramme décrit les données qu’elle gère et les
+traitements qu’elle effectue, tant pour elle- même que pour les autres classes. Cela
+offre au client une visualisation rapide et complète des composants d’une classe.
+Un diagramme de classes UML décrit les structures d’objets et d’informations
+utilisées sur nos applications, à la fois en interne et en communication avec
+ses utilisateurs. Il décrit les informations sans faire référence à une
+implémentation particulière. Ses classes et relations peuvent être implémentées de
+nombreuses manières, comme les tables de bases de données.
+35
+3. DIAGRAMME DE CLASS
+36
+La Méthode d’Étude et de Réalistion Informatique pour les Système
+d’Entreprise, plus communément appelée MERISE, est une méthodologie
+structurée qui vise à établir une démarche systématique pour la conception de
+systèmes informatiques. Elle a été développée dans les années 1970 et 1980 pour
+faciliter l’informatisation des organisations. MERISE est basée sur le modèle
+entité-association et permet de visualiser les relations entre les tables d’une base
+de données. Elle comprend trois points principaux : le cycle de vie du projet, le
+cycle de spécification du système d’information, et le domaine des données. Elle
+est une méthode rigoureuse et facile à appliquer pour la conception des systèmes
+d’information.
+La méthode MERISE nous a permis de structurer efficacement la conception de
+notre base de données. Elle nous a guidé dans l’identification des entités (les
+objets du monde réel que le système doit gérer), leurs attributs (les propriétés ou
+les caractéristiques de ces entités) et les interactions entre ces entités. Cela a
+abouti à une conception de base de données bien organisée et facile à
+comprendre.
+1. Dictionnaire de données
+Ce catalogue de données représente une liste de références nécessaires à la
+conception de la base de données relationnelle. Il rend explicite aussi les termes
+employés ultérieurement dans la base de données ainsi que la nature de l’élément
+et sa longueur.
+La réalisation d’un dictionnaire de données a amélioré notre compréhension des
+différentes entités clés de nos applications, ainsi que de leurs interactions et des
+types de relations qui les lient. Chaque entité est composée de plusieurs
+propriétés, qui sont essentiellement les informations stockées dans la base de
+données pour chaque entité, comme le nom, prénom, numéro de commande, la
+date d’achat.
+V. CONCEPTION DE LA BASE DE DONNÉ ES : MÉTHODE MERISE
+37
+V. CONCEPTION DE LA BASE DE DONNÉ ES : MÉTHODE MERISE
+L’utilisation de ce dictionnaire de données nous a permis de comprendre
+facilement les interactions entre les différentes entités de données et d’élaborer des
+solutions pour optimiser la gestion des données.
+L’exemple donne rapidement un aperçu du rendu ou de la façon dont il pourra
+être traité.
+2. Modèle Conceptuel de Données : MCD
+Le modèle conceptuel de données est une représentation simplifiée des concepts
+et des relations clés d’une base de données, mettant l’accent sur la structure
+logique. Il capture entres autres les entités, les relations et les attributs
+importants sans se préoccuper des contraintes de stockage ou de mise en œuvre.
+Ce modèle facilite la communication entre les parties prenantes et sert de base
+pour créer des modèles plus spécifiques, comme le modèle logique de données et
+le modèle physique de données. Le MCD aide à visualiser et à définir les aspects
+essentiels de la base de données, guidant ainsi le processus de conception et de
+développement.
+Grâce à tous ces éléments, nous avons pu créer un MCD sur le logiciel JMerise.
+Celui-ci finalise la conception et les interactions entre les différentes tables.
+38
+C’est un des points critiques qui nécessite du temps afin de ne pas avoir à faire la
+base de données. Dans le MCD on a différents types d’éléments, les entités qui
+regroupent un ensemble d’objets de même nature. Ces entités expriment un type,
+une classe et doivent pouvoir être identifiées par leur identifiant.
+Puis viennent les relations, il s’agit d’une association de même nature entre deux
+ou plusieurs occurrences d’entités. Une relation peut avoir aussi des propriétés
+(ou attributs). Et enfin les cardinalités, qui traduisent la participation des
+occurrences d’une entité aux occurrences d’une relation. Elles sont une
+composition avec les termes « 0,1 et n », elles sont composées par paire de
+termes. L’un désigne une entité de la relation et l’autre celle qui lui est associée.
+En effet, les possibilités sont restreintes à (0,1) (0, n) (1,1) (1, n).
+Voici un aperçu de notre modèle conceptuel de données :
+V. CONCEPTION DE LA BASE DE DONNÉ ES : MÉTHODE MERISE
+39
+V. CONCEPTION DE LA BASE DE DONNÉ ES : MÉTHODE MERISE
+3. Modèle Logique de Données : MLD
+Le modèle logique de données répond la question « par quoi ». Le MLD est une
+représentation intermédiaire entre le modèle conceptuel de données et le modèle
+physique de données.
+Ce modèle décrit les clés primaires et étrangères, qui sont essentielles pour
+identifier de manière unique les entrées, ou les enregistrements des tables. Il met
+également en évidence les relations entre les différentes tables de la base de
+données.
+Un aspect important du modèle logique de données est le concept d’absorption
+des clés. Dans ce contexte, une entité faible, qui dépend d’une autre entité pour
+son identification absorbe la clé primaire de l’entité forte sur laquelle elle dépend.
+C’est un modèle qui permet de définir la structure d’une base de données avant
+son implémentation dans un système de gestion de base de données.
+Nous avons élaboré notre Modèle Conceptuel de Données (MCD) en utilisant
+l’outil JMerise. Un des avantages significatifs de cet outil est sa capacité à
+générer automatiquement le Modèle Logique de Données (MLD) et le Modèle
+Physique de Données (MPD) à partir du MCD. Cette fonctionnalité a
+grandement facilité notre processus de conception de la base de données.
+Voici un aperçu de notre modèle logique de données.
+40
+V.CONCEPTION DE LA BASE DE DONNÉ ES : MÉTHODE MERISE
+4. Modèle Physique de Données : MPD
+Le Modèle Physique de Données (MPD) est une évolution du Modèle Logique de
+Données (MLD). Il offre une représentation tangible de la base de données,
+illustrant comment les données sont réellement stockées dans un système de
+gestion de base de données. Cela inclut les index, les contraintes et d’autres
+aspects techniques nécessaires à l’implémentation de la base de données.
+Le MPD tient compte des caractéristiques spécifiques du système de gestion de
+base de données choisi, transformant le modèle logique en une structure
+physique. Ce modèle est crucial pour la mise en œuvre et la gestion efficace de la
+base de données sur le système choisi. Dans ce modèle physique, chaque table
+est convertie en script SQL. Cela facilite l’implémentation de la base de
+données dans le système de gestion de base de données.
+Voici un aperçu de notre modèle physique de données, générée par l’outil
+Jmerise, en choisissant l’option du système de gestion de la base de données
+SQL.
+41
+V.CONCEPTION DE LA BASE DE DONNÉ ES : MÉTHODE MERISE
+42
+Dans cette partie, je vais aborder des technologies que je vais utiliser pour mener
+à bien ce projet. Ensuite, je vous présente le modèle que j’ai choisi pour
+développer les interfaces, ainsi que l’architecture de nos applications. Pour
+conclure, je vous montrerai quelques captures d’écran illustrant
+l’implémentation de nos plateformes.
+1. Langages de programmation utilisés
+Le développement de nos diverses applications s’appuie sur une sélection
+rigoureuse de technologies choisies pour assurer un développement robuste et
+performant. Nos applications sont conçues en utilisant les langages de
+programmation Symfony, en appliquant également des bonnes pratiques
+permettant de rédiger un code de qualité, dans ce sens on a opté le design pattern
+Modèle-Vue-Contrôleur (MVC). Ce modèle permet une distinction nette entre les
+couches de données, de présentation et de logique. L’application est développée
+en PHP, en utilisant le Framework Symfony, la gestion des données est assurée
+par Mysql. Cette combinaison technologique offre une base solide pour la
+construction d’application fluides, efficaces et évolutives
+2. Design Pattern : MVC
+Il existe différentes manières de structurer le code des applications, dans le cadre
+de mon projet Tibet Restaurant la structure de mon application web, j’ai adopté
+le modèle MVC. Le modèle MVC, ou modèle-vue-contrôleur est un schéma
+d’architecture logicielle qui sépare la logique du code en trois composants
+fondamentaux que l’on retrouve dans des fichiers distincts (modèles, vues et
+contrôleurs). Il va nous aider à savoir quels fichiers créer, mais surtout à définir
+leur rôle et cela rend le code plus facile à mettre à jour et permet d’organiser le
+travail . L’architecture MVC est une bonne pratique de programmation, elle
+permet de créer de site web de qualité et facile à maintenir.
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+43
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+Modèle : le « modèle » dans le contexte du modèle MVC est la composante qui
+gère les données de notre application. Sa fonction principale est de récupérer les
+informations non traitées de la base de données, de les structurer et de les préparer
+pour qu’elles puissent être traités par le contrôleur. C’est également ici qu’on
+trouve les requêtes SQL.
+Vue : c'est la composante dédiée à la présentation visuelle. Elle se concentre
+principalement sur l’affichage. Son rôle est de récupérer des variables et de les
+utiliser pour déterminer ce qui doit être affiché à l’utilisateur. Elle contient
+principalement du code HTML 5 sous format Twig, ainsi que quelques structures
+de contrôle PHP simples, comme les boucles et des conditions.
+Contrôleur : c'est la composante qui gère la logique de l’application. Il agit en
+quelque sorte comme un intermédiaire entre le Modèle et la Vue. Le contrôleur
+sollicite les données du modèle, les analyse, prend des décisions et transmet les
+informations à afficher à la vue. Il joue un rôle crucial dans le contrôle de l’accès
+aux pages, déterminant par exemple si un visiteur a le droit de voir une page
+spécifique ou non.
+Dans ce sens, nous avons développé notre projet en utilisant le Framework
+Symfony, en suivant le modèle d’architecture logicielle MVC. Cette approche a
+permis une séparation claire et efficace des préoccupations, facilitant ainsi le
+développement et la maintenance du projet. 44
+3. Développement de l’Application Tibet Restaurant
+• Définition
+Une application web compatible avec les diffèrent format d’écran pour un
+restaurant unique est une plateforme numérique qui permet aux clients de
+consulter le menu, de commander des plats en ligne pour une livraison ou un
+retrait sur place, et de payer directement via des moyens sécurisés ( paiement par
+STRIPE) . Cette même application peut être utilisée au sein du restaurant par le
+personnel pour enregistrer les commandes prises sur place et gérer les
+encaissements( en diffèrent moyen de paiement, CASH, CB et TR ) .
+L'objectif principal est de centraliser la gestion des commandes, qu'elles soient
+effectuées en ligne ou sur place, tout en offrant une expérience utilisateur fluide et
+personnalisée, tant pour les clients que pour le personnel du restaurant.
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+4. Implémentation de l’Application Tibet Restaurant
+Comme indique précédemment j’utilise le framework symfony pour la realisation
+de ce projet. Symfony est un Framework PHP populaire qui fournit une structure
+et des outils pour simplifier le développement d’applications web. Nous avons
+choisi la version 7.2 de Symfony pour sa robustesse, sa flexibilité et son support
+étendu de la communauté. Ce choix nous a permis de bénéficier des dernières
+fonctionnalités et améliorations de performance offertes par cette version.
+• Pour commencer par le commencement, j’ai crée un project web avec la
+commande
+Symfony new catering --webapp
+45
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+•Après avoir mis en place notre structure de mon application, j’ai établi les points
+de terminaison. Cela m’a permis d’intégrer progressivement les fonctionnalités.
+•Voici les differents routes disponibles dans mon application, ainsi que les
+permissions associées pour chaque type d’utilisateur.
+46
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+47
+5. Création de la base de données: MySQL
+Dans mon projet, j'ai choisi d'utiliser MySQL comme système de gestion de base de
+données (SGBD). MySQL est un SGBD relationnel open-source, capable de gérer
+de grands volumes de données avec des performances optimales. Il est
+particulièrement respectueux de l'intégrité des données et compatible avec les
+normes du langage SQL.
+La première chose à faire une fois la base de données installée est de la configurer
+pour y accéder.
+Étant donné que nous avons utilisé le framework Symfony pour l'implémentation
+de notre application web, ce dernier intègre la librairie Doctrine qui permet de
+dialoguer avec la base de données de manière simplifiée et abstraite.
+Interface de notre base de données MySQL
+Avec Symfony, l'interface de la base de données MySQL se fait principalement via
+Doctrine ORM (Object-Relational Mapping). Doctrine permet d'abstraire la
+gestion des entités et des requêtes SQL, vous permettant d'interagir avec la base de
+données à un niveau plus haut et plus structuré. Doctrine vous permet de
+manipuler des objets PHP qui sont ensuite convertis en requêtes SQL, ce qui
+simplifie énormément l'accès aux données.
+Note importante : Pour que Symfony fonctionne correctement avec MySQL, vous
+devez configurer les informations d'accès à la base de données dans le fichier .env
+de votre projet, en utilisant une URL de connexion qui inclut votre utilisateur, mot
+de passe, hôte et nom de base de données, par exemple :
+DATABASE_URL=
+"mysql://username:password@localhost:3306/nom_de_base_de_donnees"
+• l’interface de notre base de données MySQL
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+48
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+• Doctrine : ORM
+Doctrine est un ensemble de bibliothèques PHP qui facilite la gestion des bases de
+données. Il offre une intégration fluide avec Symfony et simplifie la manipulation
+des données via des objets PHP. « L’utilisation de Doctrine apporte une couche
+d’abstraction qui nous permet de nous focaliser sur la gestion de la logique métier de
+notre application. Outre cette couche d’abstraction, l’ORM doctrine est
+suffisamment générique pour nous permettre d’utiliser à partir d’une même
+configuration aussi bien une base de données MySQL, PostgreSQL qu’une base de
+données Oracle ou encore SQL Serveur.
+Pour la sécurité de notre application, doctrine apporte nativement un ensemble de
+bonnes pratiques qui permettent entre autres d’éviter toutes les failles de type
+injection SQL avec peu d’efforts ».
+Doctrine fournit également des fonctionnalités telles que la gestion des migrations
+de base de données, ce qui facilite la gestion des modifications de la structure de la
+base de données au fil du temps, en se basant sur nos entités Doctrine et nous offre
+un application web de lecture très simple et intuitive.
+49
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+Notion d’entite gerée par Doctrine
+Doctrine assure également la cohérence des objets avec des relations en gérant les
+clés étrangères et en matérialisant les relations entre les entités.
+MySQL est une base de données relationnelle toute comme PostgreSQL, Maria DB,
+etc.…de ce fait, il n’est pas rare d’avoir des relations diverses lorsque nous
+modélisons une application.
+Par exemple, dans mon modèle conceptuel de données, j’ai la table User et Order ,
+on a modélisé de cette façon : un user peut commander plusieurs order(commande) ,
+et une commande peut être lié a une seule user. Toutes ces relations peuvent être
+matérialisées en utilisant des clés étrangères en MySQL.
+Avec Doctrine, selon la nature de la relation, nous avons des moyens très simple et
+efficace de la gérer. Dans ce sens, on a trois sortes de relation majeure :
+La relation dite OneToOne : dans le cas qu’une commande peut avoir un seul
+Paiement et que ce paiement ne peut être liée qu’a une seule commande. Pour relier
+ce paiement à une commande, jai modifié simplement l’entité paiement. Dans le
+cadre de mon projet j’ai utilisé le système de cascade de Doctrine pour gérer la
+relation entre les entités commande et paiement.
+Avec ce système, j’ai défini comment Doctrine gère l’entité paiement si l’entité
+commande est modifiée. Ainsi, pendant la création et la suppression de commande,
+j’ai demandé à Doctrine de répercuter ces changements sur son paiement, c’est-àdire si l’entité commande est sauvegardée, faire de même avec l’entité paiement
+associée. Et si l’entité commande est supprimée, faire de même avec l’entité
+paiement associée.
+50
+Donc l’attribut cascade, les opérations de cascade sont effectuées par Doctrine au
+niveau applicatif. « Les opérations SQL de type DELETE et UPDATE sur les clés
+étrangères ne sont pas utilisés ». dans ce cas de figure, lorsque nous avons une entité
+commande nous pouvons trouver paiement qui lui est associée. En plus de ca ,
+lorsque j’ai une entité paiement, je suis en mesure de récupérer la commande associé.
+La relation que je viens de configurer est dite bidirectionnelle car les deux des
+membres de la relation peut faire référence à l’autre. On peut avoir certains cas, il est
+possible d’avoir une relation dite unidirectionnelle où un des deux membres peut
+faire référence à l’autre. Pour ce faire, on doit mettre à jour les annotations des
+entités, on modifie paiement pour rajouter l’information relative à la commande.
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+L’attribut mappedBY est obligatoire et il permet de dire à Doctrine que cette
+relation est bidirectionnelle et que l’attribut utilisé dans l’autre côté de la relation
+commande.
+La relation OneToOne(1, 1) : par exemple une commande est associées à une
+paiement, et une paiement peut avoir une seule commande.
+La relation ManyToOne (1, n) : par exemple plusieurs OrderItem peut contenir un
+Menu Item , et un Menu Item peut etre dans plusieurs OrderItem. Dans une relation
+ManyToOne, le many qualifie l’entité qui doit contenir l’annotation. Ici le many
+qualifie les OrderItem.
+La relation OneToMany : dans notre exemple le cas des commande et OrderItem, il
+est légitime de vouloir accéder aux OrderItm depuis l’entité commande pour afficher
+les OrderItem associées à une commande. Nous pouvons également rendre une
+relation ManyToOne bidirectionnelle en utilisant l’annotation OneToMany. Ainsi
+on peut activer les opérations de cascade pour créer une commande et toutes les
+OrderItem associées plus facilement. Donc, les relations bidirectionnelles, chacune
+des deux entités doit maintenant être configurée pour faire référence à l’autre.
+51
+« Dans les faits, une annotation OneToMany ne peut pas exister toute seule. Si le
+relation 1, n est unidirectionnelle, il faut obligatoirement avoir l’annotation
+ManyToOne. C’est une contrainte que Doctrine nous impose ».
+• Fixtures
+Après avoir installé et configuré ma base de données, et qu’on a créé nos premières
+entités, il est nécessaire d’avoir des données à exploiter. Pour cela, nous avons créé
+des fixtures, en d’autres termes nous avons écrit des commandes qui va générer
+automatiquement des données qui vont s’insérer dans notre base de données.
+Là encore c'est Symfony et plus précisément Doctrine qui va nous permettre d’écrire
+et d’exécuter simplement nos fixtures.
+• Composer require orm-fixtures –dev
+Cette commande crée un nouveau fichier AppFixture.php, déjà prérempli.
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+52
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+Maintenant que j'ai mes fixtures pour ajouter des données dans la base de données,
+j'ai utilisé la bibliothèque Faker .
+J'ai utilisé Faker pour générer des données de test réalistes et aléatoires afin de
+remplir ma base de données avec des valeurs plausibles (noms, adresses, emails,
+etc.). Cela m'a permis de simuler des données d'utilisateur, des menu items, des
+commandes, ou toute autre entité présente dans mon application, sans avoir à les
+saisir manuellement. Pour ce faire, j'ai créé une classe de fixtures dans laquelle j'ai
+utilisé Faker pour remplir les champs des entités.
+• composer require fakerphp/faker
+Ensuite, j'ai exécuté la commande suivante pour charger ces données dans la base de
+données :
+1. php bin/console doctrine:database:create (Créer la base de données)
+Cette commande sert à créer la base de données en fonction de la configuration
+définie dans ton fichier .env. Si la base de données n'existe pas encore, elle sera créée
+automatiquement. Cela crée la base de données sur le serveur de base de données
+(par exemple, MySQL, PostgreSQL). Si la base existe déjà, cette commande
+échouera.
+2. php bin/console make:migration (Créer une migration)
+Une fois que tu as modifié tes entités (par exemple, ajouté une nouvelle table ou
+modifié une colonne), tu dois générer une migration pour que ces changements
+soient reflétés dans la base de données. Cette commande analyse les différences entre
+la structure de tes entités et la base de données existante, puis génère un fichier de
+migration dans le dossier src/Migrations. Cette commande crée un fichier de
+migration contenant les instructions pour appliquer les changements à la base de
+données (comme l'ajout de tables, de colonnes, etc.).
+53
+3. php bin/console doctrine:migrations:migrate (Appliquer la migration)
+Après avoir généré une migration, tu dois l'appliquer à la base de données. Cette
+commande exécute toutes les migrations non appliquées et met à jour la base de
+données pour qu'elle corresponde à la structure définie dans les entités. Cela va
+exécuter toutes les migrations nécessaires, mettre à jour la base de données et, une
+fois que tout est à jour, marquer les migrations comme "appliquées". Tu verras
+également un résumé des migrations effectuées dans la console.
+4. php bin/console doctrine:fixtures:load (Charger les fixtures)
+Les fixtures sont des jeux de données de test. Cette commande permet de charger
+ces fixtures dans la base de données, en utilisant des données que tu as définies
+(souvent avec la bibliothèque Faker pour des données aléatoires). Cela va insérer
+les données définies dans tes fichiers de fixtures dans la base de données. Si tu as
+déjà des données dans la base, elles seront supprimées (par défaut) avant de
+charger les nouvelles.
+6. Implémentation de la partie Web
+Pour le développement de mon projet, j’ai choisi d’utiliser la version 7.2 de
+Symfony, qui est flexible et qui nous a facilité la création de notre application.
+Un aspect clé de Symfony est son moteur de Template, Twig. Ce dernier est un
+système de templates flexible, rapide et sécurisé. Il permet de générer du contenu
+HTML 5 dynamique de manière simple et efficace. Dans notre projet, c’est Twig
+qui est entièrement responsable de l’affichage de nos données dans la partie
+frontend. Il prend les données fournies par l’application, les insère dans des
+templates pour créer du contenu HTML dynamique, et renvoie ce contenu au
+navigateur pour être affiché.
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+54
+Afin d’optimiser l’application et de la rendre plus dynamique, j’ai intégré
+JavaScript dans notre développement. L’utilisation de JavaScript a permis de
+rendre le site interactif et intuitif, offrant ainsi à nos clients une navigation fluide et
+une expérience utilisateur améliorée.
+L’aspect esthétique du projet, j’ai optées pour l’utilisation de Tailwind CSS.
+Tailwind est un Framework CSS qui facilite la création et la conception de pages
+web. Il offre une bibliothèque de classes réutilisables afin d’éviter l’écriture des
+règles de style, et de cette manière styliser les éléments HTML. Cela permet aux
+développeurs de créer rapidement des mises en page élégantes en utilisant des
+classes prédéfinies pour styliser les éléments. Il est rapide et flexible.
+Tailwind facilite la création de sites responsive. Il suffit d'ajouter des préfixes aux
+classes pour spécifier des styles différents pour différentes tailles d'écran, comme
+sm:, md:, lg:, ce qui te permet de créer une interface adaptable à tous les appareils.
+Il est conçu pour être léger. Lors de la génération du fichier CSS final, l'outil
+purging élimine les classes inutilisées, ce qui réduit considérablement la taille du
+fichier CSS. Cela permet de livrer un site plus rapide avec moins de ressources à
+charger. Tailwind adopte une approche modulaire et permet de créer des
+composants réutilisables. Chaque classe utilitaire correspond à une seule fonction
+(par exemple, p-4 pour le padding, bg-blue-500 pour le fond bleu), ce qui rend ton
+code plus lisible, cohérent et facile à maintenir.
+Voici quelques captures de l’application web et le rendu final.
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+55
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+Dans cet exemple de template twig en utilisant TailwindCSS, la balise H1 est définie
+avec la class qu’indique que la margin bottom est fixé a mb-10 corresponds a 2.5rem
+(40px). Cela permet de créer un espacement entre cet élément et celui qui se trouve
+en dessous.
+Avec text-4xl il définit la taille du texte à 4xl (environ 2.25rem, soit 36px). Cela rend
+le texte assez grand, souvent utilisé pour les titres importants et un alignement centré
+avec la class text-center.
+rounded-lg : Cette classe applique des coins arrondis de taille large (environ 0.5rem,
+soit 8px). Cela donne un effet de bordure douce, créant une apparence plus fluide et
+moderne.
+shadow-lg : Cette classe ajoute une ombre portée de grande taille à l'élément div.
+Cela crée un effet de profondeur, rendant l'élément légèrement surélevé par rapport
+à son environnement. Cela améliore l’aspect visuel et attire l’attention sur l'élément.
+56
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+Ce bout de code en JavaScript gère les paiements en mettant à jour le total
+affiché et en affichant les détails du paiement. Voici une explication détaillée :
+D’abord il récupère la valeur initiale du total affiché dans un variable “total”,
+supprime le symbole '€' et convertit la chaîne en nombre.
+Ensuite j’ai ajouter un écouteur d'événement click à chaque bouton avec la
+classe “currency-btn”. Lorsqu'un bouton est cliqué, la valeur de l'attribut
+“data-value” est récupérée dans un variable “card_payment_btn” .
+Si la valeur se termine par 'c', elle est convertie en centimes (par exemple, '50c'
+devient 0,50). Sinon, elle est convertie directement en nombre.
+Ensuite il vérifie si le total est supérieur ou égal au montant, le total est
+diminué du montant et les détails du paiement sont mis à jour. Sinon, la
+monnaie à rendre est calculée et affichée.
+Enfin je vérifie si les détails du paiement contiennent le mot 'Balance', le
+bouton de paiement finale est affiché et les boutons de devise sont désactivés.
+57
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+Cette méthode show du contrôleur “CartController” gère l'affichage du panier
+d'achat. Cette méthode est associée à la route “/cart” et porte le nom “cart_show”.
+Elle prend en paramètres une interface de session (SessionInterface) et un
+repository de menuItem (MenuItemRepository).
+Dans cette method, d’abord je verifie le panier, si le panier dans la session est vide,
+un message flash d'erreur est ajouté, le panier est initialisé à un tableau vide, et
+l'utilisateur est redirigé vers la page d'accueil. Ensuite pour chaque élément du
+panier, on récupère l'élément de menu correspondant à l'aide de son ID, on l'ajoute
+au panier détaillé(detailedCart) avec sa quantité, et on met à jour le total et la
+quantité totale.Si l'utilisateur est connecté, on vérifie s'il a le rôle d'administrateur
+ou d'employé. Si c'est le cas, on affiche le panier avec le template
+“employeeCart.html.twig” ou ils aurons la possibilité pour l’encaissement en
+espèces et en ticket restaurant . Sinon, on utilise le template “index.html.twig”. Si
+l'utilisateur n'est pas connecté, on utilise également le template index.html.twig”.
+En résumé, cette méthode gère l'affichage du panier en fonction du contenu de la
+session et du rôle de l'utilisateur, en affichant des templates différents pour les
+employés/administrateurs et les autres utilisateurs.
+58
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+Cette méthode est associée à la route “/c/pay” et porte le nom “cart_pay”. Elle
+prend en paramètres une interface de session (SessionInterface), un repository de
+menuItem (MenuItemRepository), un repository d'utilisateur (UserRepository),
+une interface de gestion d'entité (EntityManagerInterface), un service de paiement
+(PaymentService) et une requête (Request).
+d’abord je récupère les demandes spéciales de la requête ou utilise "No Special
+needs" par défaut.
+Ensuite on initialise les variables pour le ‘total’ et la ‘totalQuantity’ par
+rapport la sélection de livraison (ajout de 1.9€ en plus sur la total) ou sélection
+de retrait en magasin(sans frais supplémentaire).
+Apres d’avoir eu le total, je mets a jour mon objet Order et persist sur ma base
+de donnée avec le statut de paiement à "PENDING", le statut de commande à
+"PROCCESSING", les demandes spéciales, et l'utilisateur.
+59
+Ensuite je boucle sur chaque élément du panier, et je récupère l'élément de
+menu correspondant à l'aide de son ID. Si l'élément n'existe pas, on passe à
+l'élément suivant. Sinon, on l'ajoute au panier détaillé avec sa quantité, et on
+met à jour le total et la quantité totale.
+Pour chaque élément du panier, on crée un nouvel élément de commande
+(OrderItem), on définit la quantité, l'élément de menu, la commande associée,
+et le prix de l'élément. Ensuite, on persiste chaque élément de commande et on
+les sauvegarde dans la base de données de la table OrderItem.
+Avec ce code
+$orderID = $order->getId();
+$fullUrl = $ps->askCheckout($orderID)->url;
+echo "<script>window.location.href = '" . htmlspecialchars($fullUrl) . "';
+</script>";
+On récupère l'ID de la commande et on demande l'URL de paiement via le
+service de paiement (PaymentService). Ensuite, on redirige l'utilisateur vers cette
+URL a l’aide de la “ echo” de php. Cette étape était essentielle, car chaque fois que
+la redirection vers la session de paiement de Stripe se fait, elle utilise une URL très
+longue. La redirection effectuée avec
+$this->redirect() ou ResponseRedirect()
+tronque l’URL, ce qui ne permet pas d’obtenir une URL complète et valide pour la
+session de paiement Stripe.
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+60
+Cette méthode est utilisée uniquement par les client en commandent sur la site
+de Tibet Restaurant et par les personnelle du magasin pour les encaissements
+uniquement en CB.
+VI. DÉVE LOPPEMENT ET RÉAL ISATION DU PROJET
+61
+VII. POL ITIQU E DE TESTS
+La stratégie de test mise en place en œuvre pour ce projet a englobé une variété
+d’approches afin de garantir la qualité et la fiabilité de l’application. Les
+différentes phases de tests comprenaient des tests unitaires minutieux pour
+valider chaque composant individuellement, des tests d’intégration pour évaluer
+l’interaction harmonieuse entre les parties, des tests fonctionnels visant à
+assurer le bon fonctionnement de chaque fonctionnalité, des tests
+d’interface utilisateur pour vérifier la convivialité et l’ergonomie de l’interface,
+ainsi que des tests de gestion des erreurs pour s’assurer que l’application gère
+efficacement les scénarios d’erreur. Cette approche multicouche de tests a été
+conçue pour assurer une couverture exhaustive et une expérience utilisateur
+optimale, en identifiant rapidement et en corrigeant toute déviation par rapport
+aux spécifications et aux normes de qualité fixées.
+1. Tests unitaires
+Les tests unitaires jouent un rôle crucial dans la validation de chaque composant
+de l’application en isolant et en testant individuellement les fonctions et
+méthodes. Pour cette application backend développé en PHP, le Framework
+Symfony a été utilisé pour automatiser et faciliter cette procédure de
+vérification.
+Chaque classe de traitement des services a fait l’objet de tests unitaires
+approfondis. Pour ce faire, des fichiers de tests distincts ont été créés,
+correspondant à chaque classe. Chaque fichier de test contient des cas de tests
+spécifiques à la fonctionnalité de la classe respectives.
+Le principe d’un test unitaire est très simple. Il s’agit :
+• D’exécuter du code provenant de l’application à tester.
+• Et de vérifier que tout s’est bien déroulé comme prévu.
+Cela signifie en général quand vérifie que la valeur retournée est bien la valeur
+attendue et/ou que certaines méthodes ont bien été appelées. De ce fait, un test
+permet de tester un cas avec un ou plusieurs points d’entrée, et de s’assurer que
+la sortie est celle que l’on attend.
+62
+VII. POL ITIQU E DE TESTS
+Il faut tout de même s’assurer de couvrir tous les chemins de code. Pour cela, un
+return ou le lancement d’une exception sont de bons indicateurs de tests à
+effectuer. « Il faut néanmoins faire attention à ne pas vouloir avoir un taux
+de couverture de code à 100%, car cela n’empêchera pas certains bugs, et
+c’est très chronophage, donc privilégier ce qui est sensible ».
+« Pour que les tests unitaire soient efficaces. Il ne faut pas être tributaire d’une
+communication auprès d’un service externe, qui pourrait être défaillante. Dans
+ce sens, nous restons maître de nos tests en toutes circonstances.
+Abord a commecer avec installation de PHPUnit
+composer require --dev phpunit/phpunit
+63
+Ce fichier contient une classe de test pour un contrôleur Symfony, utilisant
+PHPUnit pour tester une page web.
+On utilise la classe WebTestCase de Symfony, qui fournit des fonctionnalités
+pour tester des applications web.
+La classe MyControllerTest étend WebTestCase, ce qui permet d'utiliser les
+méthodes de test fournies par Symfony.
+putenv() method est utilisé pour configurer l'URL de la base de données pour les
+tests en utilisant la variable d'environnement DATABASE_URL.
+On crée un client HTTP pour envoyer des requêtes à l'application. Ensuite, on
+envoie une requête GET à l'URL /my-page.
+Ensuite assertResponseIsSuccessful(): Vérifie que la réponse HTTP est un
+succès (code de statut 2xx).
+assertSelectorTextContains('h1', 'Tibet Restaurant'): Vérifie que le texte
+contenu dans l'élément h1 de la page contient "Tibet Restaurant".
+Ensuite la lancement de la test se fait avec la commande
+php bin/phpunit
+Commentaire : test unitaire écrit en PHP, cette méthode vérifie le controller
+fonctionnalité d’avoir une titre de Tibet Restaurant. La méthode testPageLoad
+est appelée pour verifier le Titre H1 de la page.
+VII. POL ITIQU E DE TESTS
+64
+VII. POL ITIQU E DE TESTS
+Pour finir, ce test unitaire vérifie que la méthode testPageLoad de notre
+controller. Si le résultat du test ne correspond pas au résultat attendu, une
+exception sera levée et un message d’erreur indiquera que le résultat du test ne
+correspond pas au résultat attendu.
+Les tests unitaires sont axés sur la validation des entrées et des sorties de
+chaque fonction ou méthode. Les données de test sont fournies en entrée, et
+les résultats attendus sont comparés aux sorties effectives de la fonction. Les
+tests sont conçus pour couvrir divers scénarios, y compris les cas normaux et
+les situations d’erreur potentielles.
+Ces tests unitaires visent à garantir que chaque partie du code fonctionne
+conformément aux spécifications et aux exigences. Ils facilitent également la
+maintenance continue de l’application en identifiant rapidement les problèmes
+lors de l’introduction de nouvelles modifications
+« On dit qu’un test unitaire est un test « boite blanche ».A la différence d’un test «
+boite noire », il faut connaître le code un minimum pour être en mesure de le tester
+c’est-à-dire l’avoir lu au moins une fois. C’est logique car lors de l’écriture d’un test
+unitaire, on appelle le code explicitement».
+Un autre exemple de creation dun test unitaire pour tester l’entité MenuItem
+La première étape consiste à créer le fichier de test avec la commande suivante
+php bin/console make:test
+65
+VII. POL ITIQU E DE TESTS
+Ensuite, lorsque vous êtes invité à choisir le type de test, sélectionnez
+KernelTestCase. Ce type de test permet de créer des tests de base avec un accès
+aux services de Symfony. Il est particulièrement utile lorsque votre test
+nécessite l'utilisation du conteneur de services.
+Renommage du fichier de test
+Après avoir exécuté la commande, un fichier de test sera généré
+automatiquement avec une logique basique. Par défaut, le fichier généré aura
+un nom générique. Dans cet exemple, nous allons renommer le fichier en
+MenuItemTest. Vous pouvez le faire en ajustant son nom directement dans
+votre arborescence de projet (par exemple, dans le dossier tests/).
+Voici un exemple de fichier généré après renommage :
+Étapes pour personnaliser le test
+Une fois le fichier renommé, vous pouvez commencer à personnaliser votre
+test pour qu'il vérifie le comportement attendu de l'entité MenuItem. Par
+exemple :
+1.Charger les services nécessaires
+Si votre entité dépend de services ou d’un gestionnaire d'entités (comme
+Doctrine), vous pouvez les récupérer via le conteneur de services.
+66
+VII. POL ITIQU E DE TESTS
+2. Créer une instance de l’entité
+Vous pouvez créer un nouvel objet MenuItem et définir ses propriétés
+pour valider ses règles métier ou son comportement.
+3. Exécuter des assertions
+Utilisez des méthodes comme assertEquals ou assertNotNull pour valider
+que les données de l’entité respectent les attentes.
+Voici un exemple concret :
+Points importants à noter
+Utilisation de KernelTestCase : Ce type de test permet un accès direct au
+conteneur Symfony. Cela peut être utile pour récupérer des services
+comme le gestionnaire d'entités.
+Assertions : N'oubliez pas d'utiliser des assertions pertinentes pour valider
+le comportement de votre entité.
+Isolation : Essayez de maintenir vos tests unitaires indépendants de la base
+de données ou d'autres systèmes externes. Si vous devez tester des
+interactions avec la base de données, envisagez de créer des tests
+fonctionnels ou d'utiliser des fixtures pour configurer un environnement de
+test.
+67
+VII. POL ITIQU E DE TESTS
+Ce test vous permet de valider que votre entité fonctionne comme prévu dans
+un scénario simple.
+Lorsque vous exécutez la commande php bin/phpunit, PHPUnit va :
+Charger tous les fichiers de test dans le répertoire spécifié (généralement
+tests).
+1.
+2.Exécuter chaque méthode de test définie dans les classes de test.
+Afficher un rapport des résultats des tests, indiquant quels tests ont réussi,
+échoué ou ont été ignorés.
+3.
+Ce rapport indique que tous les tests ont réussi (OK), combien de tests ont été
+exécutés (2 test) et combien d'assertions ont été faites (4 assertion) dans mon
+test dossier entire.
+Conclusion
+Le fichier MenuItemTest.php est un fichier de test unitaire pour l'entité
+MenuItem de mon application Symfony. Il utilise PHPUnit pour définir et
+exécuter des tests afin de vérifier que l'entité MenuItem est valide selon les
+règles de validation définies.
+68
+VII. POL ITIQU E DE TESTS
+2. Tests de gestion des erreurs
+Dans le cadre des tests de gestion des erreurs, divers scénarios ont été
+envisagés pour garantir que l’application réagisse de manière appropriée en
+cas d’erreur. L’application communique clairement les erreurs rencontrées
+jusqu’à l’interface utilisateur. Par exemple, lorsqu’une saisie incorrecte est
+effectuée dans les champs de données, un mécanisme de notification
+instantanée informe l’utilisateur des erreurs spécifiques. De plus, des messages
+d’erreur explicatifs sont renvoyés par l’application sous form des message
+flash, en cas des errors rencontré, de problèmes de connexion aux services
+externes ou d’autres situations inattendue. Cette approche assure que les
+utilisateurs sont guidés de manière proactive et que les problèmes sont
+signalés et gérés de manière appropriée pour maintenir la fiabilité et
+l’utilisabilité de l’application.
+3. Tests d’intégration
+Les tests d'intégration sont des tests qui vérifient si différents composants
+d'un système fonctionnent correctement ensemble. Contrairement aux tests
+unitaires, qui testent des unités de code de manière isolée (comme une
+fonction ou une méthode), les tests d'intégration s'assurent que plusieurs
+composants, comme des classes ou des services, interagissent de manière
+adéquate.
+69
+VII. POL ITIQU E DE TESTS
+En Symfony, un test d'intégration peut inclure la vérification de la
+communication entre les entités, les repositories, les services, et la base de
+données, dans un environnement qui simule la vraie application. Cela permet
+de vérifier que le code fonctionne correctement dans son ensemble, en tenant
+compte des interactions avec la base de données, les services tiers, et d'autres
+composants.
+Explication de chaque test :
+a.testGetUserByEmail() :
+Ce test vérifie si l'on peut récupérer un utilisateur à partir de son adresse e-mail
+(ici, 'user1@email.com').
+Après avoir démarré le noyau de Symfony avec self::bootKernel(), le test
+récupère le service UserRepository via le container de services.
+Le test vérifie que l'utilisateur existe bien et que l'e-mail correspond à celui
+attendu.
+70
+b.testGetUserByEmailNotFound() :
+Ce test vérifie que lorsqu'on cherche un utilisateur avec une adresse e-mail
+inexistante (ici, 'nonexistent@email.com'), le résultat est null.
+Ce test permet de s'assurer que le système gère correctement le cas où l'email recherché n'existe pas dans la base de données.
+c. testGetUserByEmailCaseInsensitive() :
+Ce test vérifie que la recherche d'un utilisateur avec une adresse e-mail
+insensible à la casse fonctionne correctement.
+L'adresse e-mail 'USER1@EMAIL.COM' (en majuscules) est convertie en
+'user1@email.com' (en minuscules), et le test vérifie que l'utilisateur est
+trouvé malgré la différence de casse.
+Explication du Fonctionnement du Code :
+self::bootKernel() : Cette méthode initialise l'application Symfony et charge
+tous les services et la configuration. Elle permet de simuler l'environnement
+complet de l'application pendant le test.
+1.
+static::getContainer() : Permet d'accéder au conteneur de services Symfony, qui
+contient toutes les classes et services définis dans l'application.
+2.
+$container->get(UserRepository::class) : Récupère le service UserRepository,
+qui est utilisé pour interagir avec la base de données et récupérer des
+utilisateurs en fonction de critères spécifiques (comme leur adresse e-mail).
+3.
+$userRepository->findOneByEmail('...') : Utilise la méthode findOneByEmail
+du repository pour récupérer un utilisateur correspondant à l'adresse e-mail
+spécifiée. Si l'utilisateur n'existe pas, la méthode retourne null
+4.
+Assertions : Les assertions assertNotNull() et assertEquals() sont utilisées pour
+vérifier que le résultat est conforme aux attentes : l'utilisateur trouvé existe et
+l'adresse e-mail correspond à celle que nous recherchons. Voici le resultat de ce
+test.
+5.
+VII. POL ITIQU E DE TESTS
+71
+4. Tests fonctionnels
+Les tests fonctionnels ont visé à vérifier le bon comportement des
+fonctionnalités de l’application du point de vue de l’utilisateur final. Chaque
+fonctionnalité a été testée selon des scénarios définis, en reproduisant les actions
+attendues de l’utilisateur. Les résultats obtenus ont été comparés aux résultats
+escomptés, et les éventuelles divergences ont été notées et corrigées. Ces tests ont
+permis de s’assurer que l’application répond correctement aux besoins et aux
+exigences spécifiés, garantissant ainsi une expérience utilisateur cohérence et fluide.
+VII. POL ITIQU E DE TESTS
+72
+Pour realiser ce test fonctionnelle jai importer la classe WebTestCase de
+Symfony, qui permet de tester des contrôleurs web en simulant des requêtes
+HTTP dans un environnement proche de la réalité de production. et aussi un
+importe la classe Response de Symfony, qui permet de manipuler les réponses
+HTTP dans les tests.
+$client = static::createClient(); : Crée un client HTTP simulé pour envoyer
+des requêtes à l'application.
+$menuItemId = 1; : Définit l'identifiant du menu (élément du menu) que l'on
+va ajouter au panier.
+$crawler = $client->request('GET', '/cart/add/'.$menuItemId); : Envoie une
+requête GET pour ajouter un élément au panier en utilisant son identifiant.
+$this->assertResponseRedirects(); : Vérifie que la réponse du serveur est une
+redirection (on s'attend à ce qu'après l'ajout au panier, il y ait une
+redirection).
+$client->followRedirect(); : Suit la redirection pour s'assurer que le processus
+d'ajout au panier est terminé.
+$this->assertResponseIsSuccessful(); : Vérifie que la réponse après la
+redirection est une réponse réussie (code HTTP 200).
+$session = $client->getRequest()->getSession(); : Récupère la session de la
+requête actuelle pour vérifier son contenu (le panier dans ce cas).
+$cart = $session->get('cart', []); : Récupère le contenu du panier dans la
+session (si le panier n'existe pas, un tableau vide est retourné).
+$this->assertArrayHasKey($menuItemId, $cart); : Vérifie que l'élément du
+menu a bien été ajouté au panier.
+$this->assertEquals(1, $cart[$menuItemId]); : Vérifie que la quantité de
+l'élément ajouté est de 1.
+Ensuite, j'ai créé une autre fonction testAddItemTwice() qui fait le même
+fonctionnement d'ajout dans le panier pour pouvoir vérifier l'ajout dans le panier
+une deuxième fois.
+Voici le resultant de ce test fonctionnel.
+VII. POL ITIQU E DE TESTS
+73
+VIII. SÉCU RITÉ
+L’application a été conçue avec une approche axée sur la sécurité, visant à
+minimiser les vulnérabilités potentielles dans le système d’information. Un aspect
+essentiel de cette stratégie est que l’application se limite à des opérations de lecture
+et n’effectue aucune modification directe sur les autres services. Cette restriction
+réduit considérablement les risques d’injections de code malveillant.
+La base de données utilisée pour stocker les données de l’application est séparée de
+celles des autres applications, contribuant ainsi à isoler les informations sensibles et
+à réduire les points d’entrée possibles pour d’éventuelles attaques.
+La model de l’application a été conçue pour ne pas être exposée publiquement. De
+plus, j’ai mis en place un système d’authentification robuste pour les utilisateurs de
+l’application. Cela garantira que seules les personnes autorisées peuvent accéder
+aux fonctionnalités et aux données sensibles de l’application.
+En ce qui concerne les données stockées, mon application ne conserve pas
+d’informations personnelles sensible sur les utilisateurs (comme les détails de la
+carte bancaire) . Les données des tests de flux enregistrées dans la base de données
+servent principalement d’éléments de logs et d’historiques, et ne contiennent pas de
+données personnelles identifiables. De plus, je me engage à garantir la sécurité des
+données personnelles qui pourraient être traités dans le cadre des tests de flux.
+Toutes les précautions nécessaires sont prises pour éviter la divulgation non
+autorisé ou la mauvaise utilisation de ces données. En limitant la collecte et le
+stockage des données personnelles, mon application réduit les risques associés
+aux données sensibles des utilisateurs. Comme mentionné précédemment, je ne
+stocke pas de données sensibles personnelles des utilisateurs dans la base de
+données de l’application
+Voici les mesures mises en œuvre pour garantir une protection robuste des
+données et des fonctionnalités de l’application.
+74
+VIII. SÉCU RITÉ
+1. Restrictions Fonctionnelles
+L'application est limitée à des opérations spécifiques pour minimiser les risques.
+Par exemple :
+Commandes et Paiements : Les utilisateurs peuvent passer des commandes
+et effectuer des paiements via carte bancaire.
+Lecture et Historique : Les données stockées dans la base de données sont
+principalement des historiques des commandes.
+Aucune action de modification directe sur d'autres systèmes externes n'est
+effectuée, réduisant ainsi les risques d'injection de code malveillant.
+2. Cloisonnement des Données
+Base de Données Séparée : La base de données de l'application est isolée des
+autres systèmes pour minimiser les risques de propagation en cas d'incident.
+Sécurité des Données Personnelles :
+Les informations personnelles sensibles des utilisateurs (telles que les
+données bancaires) ne sont pas stockées directement dans la base de
+données.
+Les données enregistrées sont limitées à des informations nécessaires à la
+gestion des commandes et des paiements (par exemple, un identifiant de
+transaction).
+La base de données est configurée avec des droits d'accès minimaux pour
+limiter l'exposition en cas de vulnérabilité.
+3. Stockage Local et Risques de XSS
+Les informations essentielles ne sont pas stockés dans Local Storage ou Session
+Storage, afin de prévenir les risques d’accès en cas d'attaques XSS.
+La communication entre le client et le serveur est chiffrée grâce à HTTPS,
+renforçant la sécurité des données échangées.
+75
+VIII. SÉCU RITÉ
+4. Validation des Entrées Utilisateurs
+Toutes les entrées des utilisateurs sont systématiquement validées avant d’être
+utilisées. Cela permet de prévenir les attaques telles que :
+Injections SQL : Doctrine ORM est utilisé pour la gestion des données.
+Toutes les requêtes SQL sont paramétrées, éliminant ainsi le risque
+d’injections SQL.
+XSS : Le moteur Twig utilisé dans Symfony active l'échappement
+automatique des données affichées, empêchant les scripts malveillants de
+s’exécuter.
+Autres attaques : Des validations supplémentaires sont appliquées aux
+champs critiques pour éviter les injections XML, les dépassements de
+mémoire tampon, et les inclusions de fichiers.
+5. Paiements Sécurisés
+Les paiements effectués via carte bancaire sont traités par des passerelles de
+paiement conformes à la norme, garantissant un traitement sécurisé des
+transactions.
+Gestion des Tickets Restaurant et Paiements en Espèces :
+Les paiements en espèces et en Ticket Restaurant pour les employés et
+administrateurs sont enregistrés dans des journaux sécurisés, sans stockage de
+données personnelles sensibles.
+Une séparation claire des types de paiements et des utilisateurs (clients, employés,
+administrateurs) est mise en place via des rôles attribués dans le système
+d’authentification.
+6. Schéma de Stockage Cloisonné
+Le schéma de la base de données est conçu pour minimiser les risques :
+Les accès à la base de données sont restreints en fonction des rôles (ex. : admin,
+utilisateur).
+76
+VIII. SÉCU RITÉ
+7. Protection Générale
+Sécurité des Données :
+Aucune donnée de carte bancaire n’est directement stockée par
+l'application.
+Les informations de commande (les menus, montants, méthodes de
+paiement) sont uniquement accessibles par les utilisateurs authentifiés.
+Contrôle d’accès granulaire : Les fonctionnalités disponibles dans l'application
+sont régies par des permissions spécifiques définies dans le fichier security.yaml
+de Symfony.
+8. Cross origin Resource Sharing (CORS)
+Les navigateurs implémentent la « Same-Origin Policy » qui empêche une
+application de charger des ressources d’un site d’une origine différente (bien qu’il
+existe des exceptions telles que les images, les scripts).
+Ainsi une page chargée depuis un site A ne peut requêter des ressources d’un site B.
+Cela permet notamment de protéger les utilisateurs contre le vol de leurs
+comptes sur les applications sur lesquels ils sont connectés avec leur navigateurs
+lors de la consultation d’un site malveillant.
+Toutefois des contraintes de collaboration peuvent demander de partager des
+ressources entre deux sites dans le navigateur de l’utilisateur. C’est à cela que
+CORS est destiné : outrepasser de façon maîtrisée la restriction de « same-origin
+Policy ». le site concerné déclare les sites sources qui sont autorisés à la requêter.
+La mise en place de CORS s’effectue par l’ajout des en-têtes HTTP suivantes par
+l’application souhaitant voir ses ressources chargées par des applications ayant une
+origine différente :
+• Access-Control-Allow-Origin: indique les origines ayant le droit de charger des
+ressources de l’application.
+• Access-Control-Allow-Credentials : permets d’autoriser ou non la transmission
+des informations d’authentication dans les requêtes (Cookie, Authorization).
+77
+VIII. SÉCU RITÉ
+9. Politique de mot de passe forte
+Nous avons défini une politique de mot de passe stricte pour les différents types de
+compte et adaptée à leur criticité(complexité, longueur, réutilisation, expiration,
+verrouillage, stockage, accès) voici un exemple de politique de mot de passe forte :
+• Mot de passe d’au moins 6 caractères ;
+• Respect d’au moins majuscule, 1 minuscule, 1 caractère spécial ;
+• Pas de mot de passe simple (basé sur des dictionnaires, identique au nom
+d’utilisateur).
+78
+VIII. SÉCU RITÉ
+10 Mécanisme de Intégration de Google ReCaptcha v3 dans le projet Symfony
+Importance de ReCaptcha
+ReCaptcha est un outil essentiel pour protéger les applications web contre les abus
+et les activités malveillantes effectuées par des bots, tels que :
+L'envoi de spam via des formulaires en ligne.
+Les attaques automatisées qui visent à surcharger les serveurs.
+Le contournement des mesures de sécurité mises en place.
+ReCaptcha v3 offre une solution discrète et efficace. Contrairement aux versions
+précédentes, il fonctionne en arrière-plan sans imposer de défis visuels aux
+utilisateurs, ce qui améliore leur expérience tout en assurant une protection accrue.
+Pour intégrer ReCaptcha v3 dans mon application Symfony, j'ai suivi les étapes
+suivantes :
+1.Création et configuration de ReCaptcha dans la console Google
+J'ai généré une clé publique et une clé privée via la console ReCaptcha de
+Google. Ces clés sont utilisées pour authentifier les requêtes entre notre
+application et l'API ReCaptcha.
+2.
+3.Intégration du script JavaScript
+J'ai intégré ReCaptcha v3 directement à l'aide du script JavaScript fourni par
+Google. Le script a été ajouté dans le fichier HTML correspondant pour initialiser
+et gérer la validation
+79
+VIII. SÉCU RITÉ
+11. Protection contre les attaques CRSF
+a. Introduction
+Une vulnérabilité CSRF (Cross-Site Request Forgery), ou falsification de
+requête inter-sites, est une faille de sécurité qui permet à un attaquant d'abuser à
+la fois d'un utilisateur, d'un navigateur web et d'un serveur. L'objectif de l'attaque
+est de forcer un utilisateur authentifié sur un site ou une application web à
+exécuter des actions spécifiques à son insu. Il s'agit de corrompre la relation entre
+le navigateur web et le serveur.
+Une faille CSRF peut permettre à un attaquant de forcer le changement d'un
+mot de passe ou d'autres informations personnelles, puis d'en abuser pour
+récupérer des données sensibles. Si la victime détient un compte administrateur,
+une attaque CSRF peut compromettre l'ensemble de l'application web.
+Les attaques CSRF ciblent principalement les requêtes de modification (comme
+le changement de mot de passe ou la mise à jour des informations de compte)
+plutôt que le vol direct de données.
+b . Protection contre les attaques CSRF
+1) Utilisation de jetons CSRF
+Une mesure de sécurité courante pour se protéger contre les attaques CSRF
+consiste à implémenter des jetons CSRF. Ces jetons sont des valeurs uniques
+générées aléatoirement côté serveur et envoyées aux clients. Lorsqu'un utilisateur
+soumet un formulaire ou effectue une action sensible, l'application vérifie la
+validité du jeton avant d'exécuter la requête.
+2) Utilisation de l'attribut SameSite sur les cookies
+L'utilisation de l'attribut SameSite permet également de renforcer la protection
+contre le CSRF. Cet attribut peut être défini dans les cookies d'une application
+pour restreindre leur envoi au serveur uniquement si la requête provient du
+même site web. Il existe trois modes pour l'attribut SameSite:
+80
+VIII. SÉCU RITÉ
+Strict : Le cookie n'est envoyé que si la requête provient du même domaine.
+Lax (par défaut) : Le cookie est envoyé pour les requêtes GET mais pas pour
+les requêtes POST.
+None : Le cookie est envoyé dans toutes les requêtes, mais il doit être marqué
+comme Secure (HTTPS obligatoire).
+Depuis 2020, les navigateurs modernes tels que Google Chrome, Mozilla Firefox et
+Microsoft Edge ont implémenté des mesures anti-CSRF en fixant l'attribut
+SameSite à "Lax" par défaut lorsque celui-ci n'est pas défini par l'application.
+Ces améliorations ont réduit considérablement le nombre d'attaques CSRF, ce qui
+explique pourquoi cette vulnérabilité ne figure plus dans le Top 10 de l'OWASP.
+c. Implémentation de la protection CSRF dans une application Symfony
+1) Activation de la protection CSRF dans Symfony
+Symfony intègre par défaut une protection contre les attaques CSRF. Pour
+s'assurer que cette protection est activée, vérifiez le fichier de configuration :
+2) Protection des formulaires avec Symfony Forms
+Lorsque vous utilisez le système de formulaires de Symfony, la protection CSRF
+est automatiquement incluse.
+81
+VIII. SÉCU RITÉ
+3) Protection des requêtes AJAX
+Si vous utilisez des requêtes AJAX, vous devez envoyer et vérifier manuellement le
+jeton CSRF.
+1. Générer un jeton CSRF dans Twig
+82
+À la suite de l'envoi du jeton CSRF via un champ caché, je vérifie dans mon
+contrôleur si le _token est bien valide ou non afin de prendre en compte ou non la
+soumission du formulaire.
+d. Conclusion
+La protection contre les attaques CSRF est essentielle pour garantir la sécurité des
+applications web. Symfony offre une intégration native de la protection CSRF, qui
+doit être activée et correctement implémentée dans les formulaires et les requêtes
+AJAX. En complément, l'utilisation de l'attribut SameSite sur les cookies renforce
+encore plus la sécurité en prévenant l'exploitation des sessions utilisateur par des
+attaquants.
+12. Mise en place d'une redirection HTTPS dans un projet Symfony
+Dans un projet Symfony, il est essentiel d'assurer la sécurité des communications
+en forçant l'utilisation du protocole HTTPS et en bloquant les requêtes HTTP.
+Plusieurs approches permettent d'implémenter cette restriction, en fonction de
+l'architecture et de l'environnement de déploiement de l'application.
+1. Forcer HTTPS via la configuration de Symfony
+Symfony permet d'exiger l'utilisation du protocole HTTPS en configurant le fichier
+security.yaml.
+Modification de config/packages/security.yaml :
+Ajoutez la directive suivante pour exiger HTTPS sur toutes les routes :
+VIII. SÉCU RITÉ
+83
+IX. DÉPLOI EMENT
+1. Docker
+Docker est un outil qui vous permet de créer, déployer et lancer vos applications en
+utilisant des conteneurs. Docker encapsule une application et ses dépendances
+dans un conteneur isolé, ce qui garantit que l'application fonctionne
+uniformément dans n'importe quel environnement.
+Pour mettre en place ces conteneurs, on crée des images Docker. L’image Docker
+permet de configurer tout l’environnement dans lequel le conteneur va s’exécuter.
+Pour créer ces images, docker utilise un fichier spécial appelé Dockerfile, qui grâce
+à une syntaxe simple et élégante va nous permettre de préparer nos images.
+L’image est ensuite construite par Docker via l’utilisation de commandes dans le
+terminal qui sont regroupées dans ce qu’on appelle un CLI. Pour gérer l’ensemble
+des conteneurs d’une application, on utilise Docker compose.
+Docker compose permet de gérer tous les conteneurs via des services et de
+faciliter grandement leur configuration.
+Voici quelques fichiers importants de Docker :
+Dockerfile : les dockerfiles sont des fichiers spéciaux qui permettent de regrouper
+tous les éléments qui sont nécessaires au fonctionnement d’une technologie.
+Docker compose : docker compose permet de combiner toutes nos images et
+préconfigurer tous nos services pour pouvoir déployer notre application en une
+commande.
+Réseau Docker : la gestion d’un réseau est une partie très importante de toute
+implémentation d’une architecture avec Docker.
+L'utilisation de Docker comme solution de déploiement et de développement
+assure que les applications fonctionnent de manière prévisible et cohérente grâce à
+l'isolation fournie par les conteneurs. Cette approche simplifie également la
+gestion des cycles de vie des applications et améliore la sécurité en isolant les
+applications les unes des autres.
+84
+IX. DÉPLOI EMENT
+Déploiement : serveur mutualisé (Hostinger)
+Introduction
+Le déploiement d'une application web Symfony sur un serveur mutualisé présente
+certains défis, notamment en raison des restrictions d'accès et des limitations des
+ressources. Cependant, avec une configuration appropriée, il est possible de rendre
+l'application fonctionnelle et accessible en production. Ce rapport détaille les
+étapes suivies pour le déploiement de notre projet Symfony sur une plateforme
+comme Hostinger.
+Étapes de déploiement
+1.Préparation de l’environnement local
+Avant le déploiement, il est crucial de s’assurer que l’application fonctionne
+correctement en environnement local :
+Installation des dépendances via Composer :
+composer.phar install --no-dev --optimize-autoloader
+2. Configuration de l’hébergement mutualisé
+Accès FTP : Les fichiers de l'application ont été transférés vers le serveur en
+utilisant un client FTP comme FileZilla. Les fichiers Symfony ont été placés
+dans un sous-répertoire du dossier public_html (racine du serveur mutualisé).
+Configuration PHP : Hostinger prend en charge les versions récentes de PHP.
+La version PHP (8.1 ou supérieure) a été sélectionnée depuis le panneau de
+contrôle Hostinger pour s'assurer de la compatibilité avec Symfony.
+Base de données : Une base de données MySQL a été configurée via le
+panneau de contrôle. Les informations de connexion (nom de la base,
+utilisateur, mot de passe, hôte) ont été mises à jour dans le fichier .env
+3.Structure des fichiers
+Seuls les répertoires nécessaires ont été transférés :
+Le contenu de public/ a été placé dans le dossier public_html/ pour que le
+serveur pointe vers ce répertoire comme racine web.
+85
+IX. DÉPLOI EMENT
+Les autres fichiers de l’application (répertoire src/, vendor/, config/, etc.) ont été
+placés dans un répertoire situé en dehors de public_html/ pour des raisons de
+sécurité.
+4.Configuration des fichiers Symfony
+Fichier .env : Le fichier .env a été adapté avec les paramètres de
+production : APP_ENV=prod
+APP_DEBUG=0
+¨ 5.Configuration du serveur
+Redirection vers public/ : Une règle .htaccess a été ajoutée dans le répertoire
+racine pour rediriger automatiquement les requêtes vers le dossier public/.
+Voici un exemple :
+Et aussi dans le dossier public/ javais besoins d’un autre regle .htaccess qui va
+rediriger mon site sur le “/” de mon site.
+Voici un example
+86
+IX. DÉPLOI EMENT
+Optimisation du cache : Les commandes suivantes ont été exécutées pour optimiser
+l’application pour la production :
+php bin/console cache:clear --env=prod
+php bin/console cache:warmup
+6.Tests et validation
+Une fois l’installation terminée, plusieurs vérifications ont été effectuées :
+Accès à l’application via le domaine associé.
+Vérification des fonctionnalités principales pour s’assurer de l’absence
+d’erreurs en production.
+Surveillance des fichiers de logs pour identifier d’éventuels problèmes.
+87
+X. MISE EN PRODUCTION
+La mise en production est une étape clé du cycle de vie d'une application. Elle
+consiste à rendre l'application disponible pour les utilisateurs finaux sur un
+environnement stable, sécurisé et optimisé. Après avoir déployé notre application
+Symfony sur le serveur mutualisé, plusieurs actions ont été réalisées pour garantir
+une mise en production réussie.
+Étapes réalisées pour la mise en production :
+1.Configuration de l'environnement de production
+Le fichier .env a été configuré pour activer l'environnement prod :
+APP_ENV=prod
+APP_DEBUG=0
+Les caches ont été préchauffés à l'aide de la commande suivante :
+php bin/console cache:warmup
+2. Optimisation des performances
+Optimisation des dépendances : Les dépendances inutiles ont été exclues grâce à
+composer.phar install --no-dev --optimize-autoloader.
+Configuration des assets : Les fichiers CSS et JavaScript ont été compilés et
+minifiés pour réduire les temps de chargement.
+3.Sécurisation de l'application
+Les permissions des fichiers critiques (comme var/) ont été ajustées pour
+empêcher les accès non autorisés.
+Une redirection HTTPS a été mise en place pour garantir que toutes les
+connexions soient chiffrées.
+Le fichier .htaccess a été utilisé pour limiter l'accès aux ressources sensibles.
+4.Vérification fonctionnelle et monitoring
+Après le déploiement, des tests finaux ont été effectués sur l'application pour
+vérifier que toutes les fonctionnalités fonctionnent correctement.
+Un système de journalisation (logs) a été activé pour surveiller les éventuelles
+erreurs en production.
+5.Plan de maintenance
+Un plan de sauvegarde automatique a été mis en place pour assurer la
+récupération des données en cas de problème.
+Une stratégie de mise à jour régulière des dépendances et de Symfony est prévue
+pour maintenir un haut niveau de sécurité et de performance.
+88
+XI. VE I L L E DE SÉCU RITÉ : OWASP
+Dans le cadre de l'analyse de sécurité de notre application web, j’ai utilisé l'outil
+OWASP ZAP (Zed Attack Proxy) afin d'identifier d'éventuelles vulnérabilités.
+L'objectif principal de cette analyse était de détecter les failles pouvant
+compromettre la sécurité de mon application et de prendre des mesures correctives
+pour renforcer la protection des données utilisateurs.
+1. Contexte de l'Analyse
+J’ai testé mon application web en utilisant OWASP ZAP, un outil permettant
+d'automatiser la recherche de vulnérabilités de type injection SQL, XSS, CSRF, et
+autres attaques courantes. Durant le scan effectué sur mon site, une alerte a été
+détectée concernant une vulnérabilité d'injection SQL dans la route ‘cart/add’.
+2. Détection d'une Injection SQL
+L'alerte détectée concerne la possibilité d'une injection SQL dans l'URL cart/add,
+ce qui pourrait permettre à un attaquant d'exécuter des requêtes SQL malveillantes
+et potentiellement extraire, modifier ou supprimer des données de la base.
+2.1 Description de la Vulnérabilité
+L'injection SQL est une attaque qui consiste à insérer ou manipuler des requêtes
+SQL malveillantes via des entrées utilisateur non correctement sécurisées. Si le
+paramètre concerné dans cart/add n'est pas correctement filtré, un attaquant
+pourrait injecter du code SQL pour obtenir des informations sensibles ou
+manipuler les données de la base.
+2.2 Impact Potentiel
+Accès non autorisé à des données sensibles.
+Modification ou suppression de données utilisateur.
+Compromission de l'intégrité de la base de données.
+Prise de contrôle possible de l'application.
+89
+XI. VE I L L E DE SÉCU RITÉ : OWASP
+3. Recommandations et Mesures Correctives
+Pour atténuer cette vulnérabilité, nous recommandons les mesures suivantes :
+3.1 Validation et Filtrage des Entrées
+Implémenter une validation stricte des entrées utilisateurs en utilisant des listes
+blanches et des expressions régulières.
+Refuser toute entrée contenant des caractères spéciaux susceptibles d'être
+exploités en injection SQL (', --, ;, /* */).
+3.2 Utilisation de Requêtes Paramétrisées
+Remplacer les requêtes SQL dynamiques par des requêtes paramétrisées ou des
+requêtes préparées (ex : utilisation de PreparedStatement en PHP, Java ou
+Python).
+3.3 Mise en Place d'un WAF (Web Application Firewall)
+Utiliser un pare-feu applicatif pour filtrer et bloquer les requêtes suspectes avant
+qu'elles n'atteignent la base de données.
+3.4 Journaux et Surveillance
+Activer la journalisation des tentatives d'injection SQL et mettre en place une
+surveillance active pour détecter les comportements suspects.
+4. Conclusion
+L'analyse de sécurité réalisée avec OWASP ZAP a permis d'identifier une
+vulnérabilité d'injection SQL dans cart/add. Afin de garantir la sécurité de
+l'application et des données utilisateurs, il est crucial d'implémenter les
+recommandations présentées ci-dessus. La correction de cette vulnérabilité doit être
+une priorité pour renforcer la robustesse de mon application face aux cyberattaques.
+90
+CONCL U SION
+En conclusion, j’aimerais avant tout remercier tous l’équipe de Prepavenir. Bien que
+ce projet ait présenté des défis temporaires, étant donné mon expérience limitée
+avec certaines technologies, j’ai réussi à concilier la recherche approfondie sur
+leur fonctionnement avec le développement de ma solution. La réalisation de ce
+projet a été une aventure d’apprentissage considérable par la découverte de
+nombreux logiciels et outils.
+Le projet a été complété avec succès, offrant une solution intégrée pour la gestion
+des ventes de la nourriture, de la livraison et la gestion des utilisateurs. Les
+développements incluent :
+• Une application Web pour les clients, les employés internes, et l’admin de site,
+facilitant la gestion des commandes, le suivi des commandes , et l’administration
+des chiffre d’affaire en forme des rapports.
+• Une application mobile en gèrent de la partie responsive de l'application pour les
+clients, les employées et l’admin du site, optimisant le processus de commande et
+de livraison de la commande et sa suivi en temps réel.
+• Une application adapté pours les écrans de Tablet, permettant de mesurer des
+performances du système, permettant une analyse détaillée des activités.
+Les applications fournissent des fonctionnalités avancées telles que la suivi des la
+livraison en temps réel, suivi de chiffre d’affaire en temps réel.
+En outre, j’ai mis en œuvre des mesures de sécurité rigoureuses pour protéger les
+applications. La protection des données et la sécurité des transactions ont été une
+priorité, garantissant que toutes les interfaces utilisateur, les systèmes de
+paiement, et les informations sensibles sont correctement sécurisés contre les
+menaces potentielles.
+91
+XII. ANNEXES
+HomePage Tibet Restaurant
+Track Order
+92
+XII. ANNEXES
+Historic de commande PourEmployee et Admin
+Track Order
+93
+XIII. ACRONYMES
+XIII. Acronymes
+- API : Application Programming Interface (Interface de programmation
+d'application). C'est un ensemble de règles et de protocoles qui permet à différentes
+applications de communiquer entre elles.
+- Backend : La partie "arrière-plan" d'une application qui gère les données, la
+logique métier et l'interaction avec la base de données.
+- Frontend : La partie "avant-plan" ou interface utilisateur d'une application, avec
+laquelle les utilisateurs interagissent directement.
+- HTTP : HyperText Transfer Protocol (Protocole de transfert hypertexte), un
+protocole de communication utilisé pour le transfert de données sur le Web.
+- MCD : Modèle Conceptuel de Données, il s'agit d'une représentation visuelle des
+entités et de leurs relations dans une base de données.
+- MVC : Modèle-Vue-Controller, un design pattern utilisé dans le
+développement des application, séparant les concepts de données (Modèle),
+d'affichage (Vue) et de logic(Controller).
+- MySQL : Un système de gestion de base de données relationnelle open-source.
+- pop-up : Une fenêtre contextuelle qui s'ouvre généralement sur une page web ou
+une application pour afficher des informations supplémentaires ou des options.
+- Postman : Un outil populaire pour tester les API en envoyant des requêtes HTTP
+et en recevant des réponses.
+- RGPD : Règlement Général sur la Protection des Données, une règlementation
+de l'Union européenne qui vise à protéger les données personnelles des individus.
+- Route : Dans le contexte d'une application web, une route définit un chemin ou
+une URL spécifique qui est associé à une fonction ou une ressource.
+- SQL : Structured Query Language (Langage de requête structuré), un langage
+utilisé pour gérer et manipuler les bases de données relationnelle.
+- CSRF: Cross-Site Request Forgery
+- OWASP: Open Web Application Security Project
+- MCD : Modèle Conceptuel de Données
+- MLD : Modèle Logique de Données
+- MPD : Modèle Physique de Données
+- UML : Unified Modeling Language
+94
